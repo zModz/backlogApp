@@ -1,10 +1,10 @@
 {
   "expo": {
-    "name": "backlogApp",
-    "slug": "backlogApp",
-    "version": "1.0.0",
+    "name": "ARMORY",
+    "slug": "armoryapp",
+    "version": "0.1.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/ARMORY2_ico.png",
     "userInterfaceStyle": "light",
     "splash": {
       "image": "./assets/splash.png",
@@ -21,10 +21,16 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.omgitzmods.backlogApp"
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "a5aef43d-7b8c-429d-acaf-a0e527acf4b7"
+      }
     }
   }
 }

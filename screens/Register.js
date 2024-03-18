@@ -1,0 +1,133 @@
+// React
+import "react-native-gesture-handler";
+import { useState } from "react";
+import { Text, View, Alert, Image } from "react-native";
+import { StatusBar } from "expo-status-bar";
+
+// Components
+import { Button, Divider, TextInput } from "react-native-paper";
+import { useRegister } from "../hooks/useRegister";
+
+const Register = ({ navigation }) => {
+  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [cPassword, setCPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [Perror, setError] = useState("");
+
+  const { register, loading, error } = useRegister();
+
+  const handleRegister = async () => {
+    if (password === cPassword) {
+      await register(username, email, password);
+    } else {
+      setError("Passwords don't match");
+    }
+  };
+
+  return (
+    <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
+      <StatusBar style="auto" />
+      <View
+        style={{
+          elevation: 5,
+          width: 350,
+          height: "auto",
+          backgroundColor: "#fff",
+          borderRadius: 15,
+          padding: 5,
+          justifyContent: "center",
+          flexDirection: "column",
+        }}
+      >
+        <Image
+          source={require("../assets/ARMORY2_ico.png")}
+          style={{
+            height: 155,
+            width: 150,
+            alignSelf: "center",
+            margin: 15,
+          }}
+        />
+        {error && (
+          <View
+            style={{
+              padding: 10,
+              backgroundColor: "#ffefef",
+              borderRadius: 4,
+              borderStyle: "solid",
+              borderColor: "#e7195a",
+              borderWidth: 1,
+              margin: 10,
+            }}
+          >
+            <Text style={{ color: "#e7195a" }}>{error || Perror}</Text>
+          </View>
+        )}
+        <TextInput
+          mode="outlined"
+          label="Username"
+          onChangeText={(text) => setUsername(text)}
+          value={username}
+          style={{ margin: 10 }}
+        />
+        <TextInput
+          mode="outlined"
+          label="Email"
+          onChangeText={(text) => setEmail(text)}
+          value={email}
+          style={{ margin: 10 }}
+        />
+        <TextInput
+          mode="outlined"
+          label="Password"
+          onChangeText={(text) => setPassword(text)}
+          value={password}
+          secureTextEntry={!showPassword}
+          style={{ margin: 10 }}
+          right={
+            <TextInput.Icon
+              icon={showPassword ? "eye-off" : "eye"}
+              onPress={() => setShowPassword(!showPassword)}
+            />
+          }
+        />
+        <TextInput
+          mode="outlined"
+          label="Confirm Password"
+          onChangeText={(text) => setCPassword(text)}
+          value={cPassword}
+          secureTextEntry={!showPassword}
+          style={{ margin: 10 }}
+          right={
+            <TextInput.Icon
+              icon={showPassword ? "eye-off" : "eye"}
+              onPress={() => setShowPassword(!showPassword)}
+            />
+          }
+        />
+        <Button
+          mode="contained"
+          icon="account-plus"
+          loading={loading}
+          disabled={loading}
+          onPress={() => handleRegister()}
+          style={{ margin: 10 }}
+        >
+          Create Account
+        </Button>
+        <Button
+          mode="outlined"
+          icon={"login"}
+          style={{ margin: 10 }}
+          onPress={() => navigation.navigate("Login")}
+        >
+          Already a user
+        </Button>
+      </View>
+    </View>
+  );
+};
+
+export default Register;
