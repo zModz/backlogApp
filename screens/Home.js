@@ -1,19 +1,25 @@
 import React from "react";
-import { View, Image, ScrollView, ImageBackground, Touchable, Pressable } from "react-native";
+import {
+  View,
+  Image,
+  ScrollView,
+  ImageBackground,
+  Pressable,
+} from "react-native";
 import { StatusBar } from "expo-status-bar";
-import { Button, Card, FAB, IconButton, Text } from "react-native-paper";
+import { FAB, IconButton, Text } from "react-native-paper";
 import { useNavigation } from "@react-navigation/native";
 
 import Styles from "../Styles";
 
 const Home = ({ route }) => {
   const [state, setState] = React.useState({ open: false });
-  const onStateChange = ({ open }) => setState({ open });
   const { open } = state;
+  const onStateChange = ({ open }) => setState({ open });
 
   const navigation = useNavigation();
 
-  const { email, username } = route.params;
+  const { username } = route.params;
 
   return (
     <View style={Styles.container}>
@@ -69,10 +75,18 @@ const Home = ({ route }) => {
                 uri: "https://images.igdb.com/igdb/image/upload/t_cover_big/co1wkl.png",
               }}
               imageStyle={{ borderRadius: 25 }}
-              style={{ flex: 1, justifyContent: 'flex-end', alignItems: 'center' }}
+              style={{
+                flex: 1,
+                justifyContent: "flex-end",
+                alignItems: "center",
+              }}
             >
-              <Text variant="titleSmall" style={{ color: "white" }}>Call of Duty: Black Ops</Text>
-              <Text variant="bodySmall" style={{ color: "white" }}>Call of Duty: Black Ops</Text>
+              <Text variant="titleSmall" style={{ color: "white" }}>
+                Call of Duty: Black Ops
+              </Text>
+              <Text variant="bodySmall" style={{ color: "white" }}>
+                Call of Duty: Black Ops
+              </Text>
             </ImageBackground>
           </View>
         </ScrollView>

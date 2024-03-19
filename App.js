@@ -1,6 +1,10 @@
+//#region Imports
+// React
 import "react-native-gesture-handler";
 import * as React from "react";
 import { View } from "react-native";
+
+// Custom Packages
 import { createStackNavigator } from "@react-navigation/stack";
 import { NavigationContainer } from "@react-navigation/native";
 import { ActivityIndicator, PaperProvider, Portal } from "react-native-paper";
@@ -10,16 +14,21 @@ import AddGame from "./screens/AddGame";
 import Login from "./screens/Login";
 import Register from "./screens/Register";
 
-import { AuthContextProvider } from "./context/authContext";
-import { useAuthContext } from "./hooks/useAuthContext";
+// Components
 import DrawerMenu from "./components/DrawerComponent";
+
+// Context
+import { AuthContextProvider } from "./context/authContext";
 import { BacklogCTXProvider } from "./context/backlogContext";
+
+// Hooks
+import { useAuthContext } from "./hooks/useAuthContext";
+//#endregion
 
 const Stack = createStackNavigator();
 
 function Main() {
   const { user, loading, auth } = useAuthContext();
-  const [isLoading, setIsLoading] = React.useState(true);
 
   if (loading) {
     return (
@@ -52,8 +61,16 @@ function Main() {
               </>
             ) : (
               <>
-                <Stack.Screen name="Login" component={Login} options={{ headerShown: false }} />
-                <Stack.Screen name="Register" component={Register} options={{ headerShown: false }} />
+                <Stack.Screen
+                  name="Login"
+                  component={Login}
+                  options={{ headerShown: false }}
+                />
+                <Stack.Screen
+                  name="Register"
+                  component={Register}
+                  options={{ headerShown: false }}
+                />
               </>
             )}
           </Stack.Navigator>
