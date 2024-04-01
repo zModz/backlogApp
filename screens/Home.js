@@ -5,12 +5,11 @@ import {
   ScrollView,
   ImageBackground,
   Pressable,
+  StatusBar,
 } from "react-native";
-import { StatusBar } from "expo-status-bar";
-import { FAB, IconButton, Text } from "react-native-paper";
-import { useNavigation } from "@react-navigation/native";
-
-import Styles from "../Styles";
+import * as EXPO from "expo-status-bar";
+import { Avatar, FAB, IconButton, Text } from "react-native-paper";
+import { useNavigation, useTheme } from "@react-navigation/native";
 
 const Home = ({ route }) => {
   const [state, setState] = React.useState({ open: false });
@@ -21,9 +20,17 @@ const Home = ({ route }) => {
 
   const { username } = route.params;
 
+  const colors = useTheme().colors;
+
   return (
-    <View style={Styles.container}>
-      <StatusBar style="auto" />
+    <View
+      style={{
+        flex: 1,
+        backgroundColor: colors.secondary,
+        paddingTop: StatusBar.currentHeight,
+      }}
+    >
+      <EXPO.StatusBar style="auto" />
       <View
         style={{
           padding: 10,
@@ -35,31 +42,35 @@ const Home = ({ route }) => {
       >
         <View style={{ flexDirection: "row", alignItems: "center" }}>
           <Pressable onPress={() => navigation.openDrawer()}>
-            <Image
-              source={{
-                uri: "https://st3.depositphotos.com/6672868/13701/v/450/depositphotos_137014128-stock-illustration-user-profile-icon.jpg",
-              }}
+            <Avatar.Text
+              size={50}
+              label={username[0]}
               style={{
-                width: 50,
-                height: 50,
-                borderRadius: 15,
                 margin: 10,
+                backgroundColor: colors.text,
               }}
+              color={colors.primary}
             />
           </Pressable>
           <View style={{ flexDirection: "column" }}>
-            <Text variant="titleMedium">Hello!</Text>
-            <Text style={{ color: "white" }}>@{username}</Text>
+            <Text variant="titleMedium" style={{ color: colors.primary }}>
+              Hello!
+            </Text>
+            <Text style={{ color: colors.accent, fontWeight: "bold" }}>
+              @{username}
+            </Text>
           </View>
         </View>
         <IconButton
           icon={"bell"}
-          style={{ backgroundColor: "#ccd", margin: 10 }}
+          style={{ backgroundColor: colors.text, margin: 10 }}
         />
       </View>
 
       <View style={{ padding: 10 }}>
-        <Text variant="headlineLarge">Discover</Text>
+        <Text variant="headlineLarge" style={{ color: colors.primary }}>
+          Discover
+        </Text>
         <ScrollView horizontal={true}>
           <View
             style={{
@@ -68,6 +79,7 @@ const Home = ({ route }) => {
               backgroundColor: "white",
               borderRadius: 25,
               margin: 15,
+              elevation: 5,
             }}
           >
             <ImageBackground
@@ -101,11 +113,21 @@ const Home = ({ route }) => {
           {
             icon: "animation-play",
             label: "Add to Queue",
+            color: colors.primary,
+            labelTextColor: colors.primary,
+            style: {
+              backgroundColor: colors.accent,
+            },
             onPress: () => console.log("Pressed queue"),
           },
           {
             icon: "gamepad-variant",
             label: "Add New Game",
+            color: colors.primary,
+            labelTextColor: colors.primary,
+            style: {
+              backgroundColor: colors.accent,
+            },
             onPress: () => {
               navigation.navigate("AddGame");
             },
@@ -113,10 +135,18 @@ const Home = ({ route }) => {
           {
             icon: "playlist-play",
             label: "Create Playlist",
+            color: colors.primary,
+            labelTextColor: colors.primary,
+            style: {
+              backgroundColor: colors.accent,
+            },
             onPress: () => console.log("Pressed playlist"),
           },
         ]}
         onStateChange={onStateChange}
+        fabStyle={{ backgroundColor: colors.accent }}
+        color={colors.primary}
+        backdropColor={colors.text}
       />
     </View>
   );

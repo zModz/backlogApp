@@ -18,7 +18,10 @@ const Drawer = createDrawerNavigator();
 function DrawerMenu() {
   const { user } = useAuthContext();
   return (
-    <Drawer.Navigator drawerContent={(drops) => <CustomDrawer drops={drops} user={user} />} screenOptions={{ drawerLabelStyle: { marginLeft: -20 } }}>
+    <Drawer.Navigator
+      drawerContent={(drops) => <CustomDrawer drops={drops} user={user} />}
+      screenOptions={{ drawerLabelStyle: { marginLeft: -20 } }}
+    >
       <Drawer.Screen
         name="Home"
         component={Home}
@@ -30,7 +33,7 @@ function DrawerMenu() {
               size={size}
             />
           ),
-          headerShown: false
+          headerShown: false,
         }}
       />
       <Drawer.Screen
@@ -43,6 +46,9 @@ function DrawerMenu() {
               size={size}
             />
           ),
+          headerStyle: {
+            shadowColor: "black",
+          },
         }}
       />
       <Drawer.Screen

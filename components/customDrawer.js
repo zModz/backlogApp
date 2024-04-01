@@ -1,6 +1,6 @@
 import React from "react";
 import { View, Image } from "react-native";
-import { Button, Divider, Text } from "react-native-paper";
+import { Avatar, Button, Divider, Text } from "react-native-paper";
 
 // React Drawer
 import {
@@ -13,9 +13,12 @@ import { useAuthContext } from "../hooks/useAuthContext";
 import { useLogout } from "../hooks/useLogout";
 
 import Constants from "expo-constants";
+import { useTheme } from "@react-navigation/native";
 
 const CustomDrawer = ({ drops, user }) => {
   // const { user } = useAuthContext();
+
+  const colors = useTheme().colors;
 
   const username = user ? user.username : ""; // Check if user exists before accessing its properties
   const { logout } = useLogout();
@@ -25,19 +28,17 @@ const CustomDrawer = ({ drops, user }) => {
   };
 
   return (
-    <View style={{ flex: 1 }}>
+    <View style={{ flex: 1, backgroundColor: colors.secondary }}>
       <DrawerContentScrollView>
         <View style={{ padding: 20 }}>
-          <Image
-            source={{
-              uri: "https://st3.depositphotos.com/6672868/13701/v/450/depositphotos_137014128-stock-illustration-user-profile-icon.jpg",
-            }}
+          <Avatar.Text
+            size={50}
+            label={username[0]}
             style={{
-              width: 50,
-              height: 50,
-              borderRadius: 40,
               marginBottom: 10,
+              backgroundColor: colors.text,
             }}
+            color={colors.primary}
           />
           <Text variant="titleLarge">DISPLAY NAME</Text>
           <Text variant="bodyMedium">@{username}</Text>
@@ -50,13 +51,21 @@ const CustomDrawer = ({ drops, user }) => {
           icon={"logout"}
           onPress={() => handleLogout()}
           style={{ marginBottom: 10 }}
+          textColor={colors.accent}
         >
           Logout
         </Button>
         <Text style={{ alignSelf: "center", marginBottom: 10 }}>
           Made with ❤️ from Portugal 🇵🇹
         </Text>
-        <Text style={{ alignSelf: "center", fontSize: 10, fontStyle: 'italic', color: '#9b9b9b' }}>
+        <Text
+          style={{
+            alignSelf: "center",
+            fontSize: 10,
+            fontStyle: "italic",
+            color: "#9b9b9b",
+          }}
+        >
           ARMORY v{Constants.expoConfig.version}
         </Text>
       </View>

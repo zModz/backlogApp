@@ -2,12 +2,17 @@
 // React
 import "react-native-gesture-handler";
 import * as React from "react";
-import { View } from "react-native";
+import { View, useColorScheme } from "react-native";
 
 // Custom Packages
+import {
+  NavigationContainer,
+  DarkTheme,
+  DefaultTheme,
+} from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
-import { NavigationContainer } from "@react-navigation/native";
 import { ActivityIndicator, PaperProvider, Portal } from "react-native-paper";
+import Colors from "./theme/Colors";
 
 // Custom Screens
 import AddGame from "./screens/AddGame";
@@ -30,6 +35,8 @@ const Stack = createStackNavigator();
 function Main() {
   const { user, loading, auth } = useAuthContext();
 
+  // const theme = useColorScheme();
+
   if (loading) {
     return (
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
@@ -38,10 +45,15 @@ function Main() {
     );
   }
 
+  theme = "dark";
+  console.log(theme);
+
   return (
     <PaperProvider>
       <Portal>
-        <NavigationContainer>
+        <NavigationContainer
+          theme={theme === "dark" ? Colors.dark : Colors.light}
+        >
           <Stack.Navigator>
             {user ? (
               <>

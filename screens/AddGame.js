@@ -8,11 +8,16 @@ import Modal from "react-native-modal";
 import axios from "axios";
 import SearchCard from "../components/SearchCard";
 import GameModal from "../components/Modal";
+import { fetchGame } from "../hooks/fetchGame";
+import { useTheme } from "@react-navigation/native";
 
 // AddGame component definition
 const AddGame = ({ route }) => {
   const [isModalVisible, setModalVisible] = React.useState(false);
   const [modalData, setmodalData] = React.useState([]);
+  const { game, isLoading, getGame } = fetchGame();
+
+  const colors = useTheme().colors;
 
   const toggleModal = () => {
     setModalVisible(!isModalVisible);
@@ -22,55 +27,6 @@ const AddGame = ({ route }) => {
 
   // Initialize state for text input and games array
   const [text, setText] = React.useState("");
-  const [timer, setTimer] = React.useState(null);
-  const [games, setGames] = React.useState([]);
-  const [isLoading, setIsLoading] = React.useState(false);
-
-  // getGame function definition
-  const getGame = async (t) => {
-    // set up request parameters if user input is null
-    let body =
-      "fields cover.url,name,release_dates.date,genres.name,category;where version_parent = null & category = (0,3,6,8); limit 10;";
-
-    // Update the text state with the user's input
-    setText(t);
-
-    if (t != "") {
-      // show loading spinner while fetching game info
-      setIsLoading(true);
-
-      // set up request parameters if user input is not null
-      body =
-        'fields cover.url, name, release_dates.date, genres.name, category, involved_companies.*, screenshots.url, platforms, summary, status, rating; search "' +
-        text +
-        '";where rating != null & version_parent = null & category = (0,1,3,6,8);';
-    }
-
-    clearTimeout(timer);
-
-    const newTimer = setTimeout(async () => {
-      // Make a POST request to the IGDB API to search for games
-      await axios
-        .post("https://api.igdb.com/v4/games", body, {
-          // Set the required headers for the API request
-          headers: {
-            "Client-ID": process.env.EXPO_PUBLIC_CLIENTID,
-            Authorization: auth.token_type + " " + auth.access_token,
-          },
-        })
-        .then((res) => {
-          setGames(res.data);
-        }) // Set the games state with the response data
-        .catch((err) => {
-          Alert.alert("An Error Occured", err);
-        }) // Log any errors
-        .finally(() => {
-          setIsLoading(false);
-        }); // Hide loading spinner when finished searching
-    }, 500);
-
-    setTimer(newTimer);
-  };
 
   // Return the JSX for the AddGame component
   return (
@@ -107,7 +63,13 @@ const AddGame = ({ route }) => {
           label="Pick a Game"
           placeholder="Halo: Combat Evolved"
           value={text}
-          onChangeText={getGame}
+          onChangeText={(t) => {
+            setText(t);
+            getGame(text, auth);
+          }}
+          selectionColor={colors.accent}
+          cursorColor={colors.accent}
+          activeOutlineColor={colors.accent}
         />
       </View>
       <View>
@@ -124,17 +86,17 @@ const AddGame = ({ route }) => {
               }}
             >
               {/* Map through the games array and display each game's name */}
-              {games
+              {game
                 .sort((a, b) => b.rating - a.rating)
-                .map((game, i) => (
+                .map((games, i) => (
                   <Pressable
                     key={i}
                     onPress={() => {
-                      setmodalData(game);
+                      setmodalData(games);
                       toggleModal();
                     }}
                   >
-                    <SearchCard key={i} game={game} />
+                    <SearchCard key={i} game={games} />
                   </Pressable>
                 ))}
             </ScrollView>
