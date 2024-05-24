@@ -12,14 +12,17 @@ export const useLogin = () => {
     setLoading(true);
     setError(null);
 
-    const res = await fetch("http://192.168.1.62:3000/api/users/login", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ email, password }),
-    }).catch((error) => {
-      Alert.alert("Request Timeout", error);
+    const res = await fetch(
+      process.env.EXPO_PUBLIC_SERVER_IP + "/api/users/login",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+      }
+    ).catch((error) => {
+      Alert.alert("Request Timeout", error.message);
     });
 
     const json = await res.json();
@@ -36,6 +39,7 @@ export const useLogin = () => {
         setLoading(false);
       } catch (error) {
         setError(error.message);
+        // console.error(error);
       }
     }
   };

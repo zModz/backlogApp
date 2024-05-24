@@ -5,11 +5,7 @@ import * as React from "react";
 import { View, useColorScheme } from "react-native";
 
 // Custom Packages
-import {
-  NavigationContainer,
-  DarkTheme,
-  DefaultTheme,
-} from "@react-navigation/native";
+import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import { ActivityIndicator, PaperProvider, Portal } from "react-native-paper";
 import Colors from "./theme/Colors";
@@ -28,25 +24,42 @@ import { BacklogCTXProvider } from "./context/backlogContext";
 
 // Hooks
 import { useAuthContext } from "./hooks/useAuthContext";
+import { useLogout } from "./hooks/useLogout";
+import Notifications from "./screens/Notifications";
 //#endregion
 
 const Stack = createStackNavigator();
 
 function Main() {
   const { user, loading, auth } = useAuthContext();
+  const { logout } = useLogout();
 
-  // const theme = useColorScheme();
+  const theme = useColorScheme();
 
   if (loading) {
     return (
-      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-        <ActivityIndicator size="large" />
+      <View
+        style={{
+          flex: 1,
+          justifyContent: "center",
+          alignItems: "center",
+          backgroundColor:
+            theme === "dark"
+              ? Colors.dark.colors.background
+              : Colors.dark.colors.background,
+        }}
+      >
+        <ActivityIndicator
+          size="large"
+          color={
+            theme === "dark"
+              ? Colors.dark.colors.primary
+              : Colors.dark.colors.primary
+          }
+        />
       </View>
     );
   }
-
-  theme = "dark";
-  console.log(theme);
 
   return (
     <PaperProvider>
@@ -66,8 +79,13 @@ function Main() {
                   <Stack.Screen
                     name="AddGame"
                     component={AddGame}
-                    options={{ title: "Add Game" }}
+                    options={{ title: "Add Game", headerShown: false }}
                     initialParams={auth}
+                  />
+                  <Stack.Screen
+                    name="Notifications"
+                    component={Notifications}
+                    options={{ headerShown: false }}
                   />
                 </Stack.Group>
               </>

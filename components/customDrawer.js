@@ -28,7 +28,7 @@ const CustomDrawer = ({ drops, user }) => {
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: colors.secondary }}>
+    <View style={{ flex: 1, backgroundColor: colors.background }}>
       <DrawerContentScrollView>
         <View style={{ padding: 20 }}>
           <Avatar.Text
@@ -36,26 +36,36 @@ const CustomDrawer = ({ drops, user }) => {
             label={username[0]}
             style={{
               marginBottom: 10,
-              backgroundColor: colors.text,
+              backgroundColor: colors.accent,
             }}
-            color={colors.primary}
+            color={colors.secondaryAccent}
           />
-          <Text variant="titleLarge">DISPLAY NAME</Text>
-          <Text variant="bodyMedium">@{username}</Text>
+          <Text
+            variant="titleLarge"
+            style={{ color: colors.text, fontWeight: "bold" }}
+          >
+            DISPLAY NAME
+          </Text>
+          <Text variant="bodyMedium" style={{ color: colors.text }}>
+            @{username}
+          </Text>
         </View>
         <DrawerItemList {...drops} />
       </DrawerContentScrollView>
       <View style={{ padding: 20 }}>
         <Divider style={{ marginBottom: 10 }} />
         <Button
+          mode="outlined"
           icon={"logout"}
           onPress={() => handleLogout()}
-          style={{ marginBottom: 10 }}
-          textColor={colors.accent}
+          style={{ marginBottom: 10, borderColor: colors.primary }}
+          textColor={colors.primary}
         >
           Logout
         </Button>
-        <Text style={{ alignSelf: "center", marginBottom: 10 }}>
+        <Text
+          style={{ alignSelf: "center", marginBottom: 10, color: colors.text }}
+        >
           Made with ❤️ from Portugal 🇵🇹
         </Text>
         <Text

@@ -15,6 +15,7 @@ import { StatusBar } from "expo-status-bar";
 // Components
 import { Button, TextInput } from "react-native-paper";
 import { useLogin } from "../hooks/useLogin";
+import { useTheme } from "@react-navigation/native";
 
 const Login = ({ navigation }) => {
   const [email, setEmail] = useState("");
@@ -27,17 +28,26 @@ const Login = ({ navigation }) => {
     await login(email, password);
   };
 
+  const colors = useTheme().colors;
+
   return (
-    <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
-      <StatusBar style="auto" />
-      <KeyboardAvoidingView behavior={Platform.ios ? "padding" : "height"}>
-        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+      <View
+        style={{
+          flex: 1,
+          alignItems: "center",
+          justifyContent: "center",
+          backgroundColor: colors.background,
+        }}
+      >
+        <StatusBar style="auto" />
+        <KeyboardAvoidingView behavior={Platform.ios ? "padding" : "height"}>
           <View
             style={{
               elevation: 5,
               width: 350,
               height: "auto",
-              backgroundColor: "#fff",
+              backgroundColor: colors.secondary,
               borderRadius: 15,
               padding: 5,
               justifyContent: "center",
@@ -65,7 +75,7 @@ const Login = ({ navigation }) => {
                   margin: 10,
                 }}
               >
-                <Text style={{ color: "#e7195a" }}>{error}</Text>
+                {/* <Text style={{ color: "#e7195a" }}>{error}</Text> */}
               </View>
             )}
             <TextInput
@@ -73,6 +83,7 @@ const Login = ({ navigation }) => {
               label="Email"
               onChangeText={(text) => setEmail(text)}
               value={email}
+              activeOutlineColor={colors.text}
               style={{ margin: 10 }}
               error={error}
             />
@@ -81,6 +92,7 @@ const Login = ({ navigation }) => {
               label="Password"
               onChangeText={(text) => setPassword(text)}
               value={password}
+              activeOutlineColor={colors.text}
               secureTextEntry={!showPassword}
               style={{ margin: 10 }}
               right={
@@ -96,6 +108,8 @@ const Login = ({ navigation }) => {
               icon="login"
               loading={loading}
               disabled={loading}
+              buttonColor={colors.primary}
+              textColor={colors.secondaryAccent}
               onPress={() => handleSubmit()}
               style={{ margin: 10 }}
             >
@@ -104,15 +118,16 @@ const Login = ({ navigation }) => {
             <Button
               mode="outlined"
               icon={"account-plus"}
-              style={{ margin: 10 }}
+              textColor={colors.primary}
+              style={{ margin: 10, borderColor: colors.primary }}
               onPress={() => navigation.navigate("Register")}
             >
               Create an Account
             </Button>
           </View>
-        </TouchableWithoutFeedback>
-      </KeyboardAvoidingView>
-    </View>
+        </KeyboardAvoidingView>
+      </View>
+    </TouchableWithoutFeedback>
   );
 };
 

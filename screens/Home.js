@@ -8,7 +8,7 @@ import {
   StatusBar,
 } from "react-native";
 import * as EXPO from "expo-status-bar";
-import { Avatar, FAB, IconButton, Text } from "react-native-paper";
+import { Avatar, FAB, IconButton, Text, Badge } from "react-native-paper";
 import { useNavigation, useTheme } from "@react-navigation/native";
 
 const Home = ({ route }) => {
@@ -26,49 +26,62 @@ const Home = ({ route }) => {
     <View
       style={{
         flex: 1,
-        backgroundColor: colors.secondary,
-        paddingTop: StatusBar.currentHeight,
+        backgroundColor: colors.background,
       }}
     >
       <EXPO.StatusBar style="auto" />
       <View
         style={{
-          padding: 10,
+          paddingTop: StatusBar.currentHeight,
+          padding: 5,
           marginBottom: 10,
           flexDirection: "row",
           alignItems: "center",
           justifyContent: "space-between",
+          backgroundColor: colors.secondary,
+          borderBottomLeftRadius: 15,
+          borderBottomRightRadius: 15,
+
+          minWidth: 360,
+          minHeight: 100,
         }}
       >
         <View style={{ flexDirection: "row", alignItems: "center" }}>
           <Pressable onPress={() => navigation.openDrawer()}>
             <Avatar.Text
-              size={50}
+              size={40}
               label={username[0]}
               style={{
                 margin: 10,
-                backgroundColor: colors.text,
+                backgroundColor: colors.accent,
               }}
-              color={colors.primary}
+              color={colors.secondaryAccent}
             />
           </Pressable>
+          {/* <IconButton icon={"menu"} onPress={navigation.openDrawer} /> */}
           <View style={{ flexDirection: "column" }}>
-            <Text variant="titleMedium" style={{ color: colors.primary }}>
+            <Text
+              variant="titleMedium"
+              style={{ color: colors.text, fontWeight: "bold" }}
+            >
               Hello!
             </Text>
-            <Text style={{ color: colors.accent, fontWeight: "bold" }}>
-              @{username}
-            </Text>
+            <Text style={{ color: colors.text }}>@{username}</Text>
           </View>
         </View>
-        <IconButton
-          icon={"bell"}
-          style={{ backgroundColor: colors.text, margin: 10 }}
-        />
+        <View>
+          <IconButton
+            icon={"bell"}
+            iconColor={colors.text}
+            onPress={() => navigation.navigate("Notifications")}
+            style={{ margin: 10 }}
+          />
+          {/* <Badge style={{ position: "absolute", top: 4, right: 0 }}>1</Badge> */}
+        </View>
       </View>
 
       <View style={{ padding: 10 }}>
-        <Text variant="headlineLarge" style={{ color: colors.primary }}>
+        <Text variant="headlineLarge" style={{ color: colors.text }}>
           Discover
         </Text>
         <ScrollView horizontal={true}>
@@ -113,20 +126,20 @@ const Home = ({ route }) => {
           {
             icon: "animation-play",
             label: "Add to Queue",
-            color: colors.primary,
+            color: colors.secondaryAccent,
             labelTextColor: colors.primary,
             style: {
-              backgroundColor: colors.accent,
+              backgroundColor: colors.primary,
             },
             onPress: () => console.log("Pressed queue"),
           },
           {
             icon: "gamepad-variant",
             label: "Add New Game",
-            color: colors.primary,
+            color: colors.secondaryAccent,
             labelTextColor: colors.primary,
             style: {
-              backgroundColor: colors.accent,
+              backgroundColor: colors.primary,
             },
             onPress: () => {
               navigation.navigate("AddGame");
@@ -135,18 +148,18 @@ const Home = ({ route }) => {
           {
             icon: "playlist-play",
             label: "Create Playlist",
-            color: colors.primary,
+            color: colors.secondaryAccent,
             labelTextColor: colors.primary,
             style: {
-              backgroundColor: colors.accent,
+              backgroundColor: colors.primary,
             },
             onPress: () => console.log("Pressed playlist"),
           },
         ]}
         onStateChange={onStateChange}
-        fabStyle={{ backgroundColor: colors.accent }}
-        color={colors.primary}
-        backdropColor={colors.text}
+        fabStyle={{ backgroundColor: colors.primary }}
+        color={colors.secondaryAccent}
+        backdropColor={colors.background}
       />
     </View>
   );

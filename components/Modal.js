@@ -135,7 +135,7 @@ const GameModal = ({ game, auth }) => {
     if (!user) return;
 
     const res = await fetch(
-      "http://192.168.1.62:3000/api/backlog/" + user.backlogID,
+      process.env.EXPO_PUBLIC_SERVER_IP + "/api/backlog/" + user.backlogID,
       {
         method: "PATCH",
         headers: {

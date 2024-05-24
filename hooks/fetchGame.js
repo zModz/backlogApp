@@ -22,7 +22,7 @@ export const fetchGame = () => {
         body:
           'fields cover.url, name, release_dates.date, genres.name, category, involved_companies.*, screenshots.url, platforms, summary, status, rating; search "' +
           t +
-          '";where rating != null & version_parent = null & category = (0,1,3,6,8);',
+          '%";where rating != null & version_parent = null & category = (0,1,3,6,8);',
       })
         .catch((err) => {
           Alert.alert("An Error Occured", err.message);

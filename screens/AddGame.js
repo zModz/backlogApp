@@ -1,15 +1,21 @@
 import React from "react";
-import { View, ScrollView, SafeAreaView, Pressable } from "react-native";
-import { ActivityIndicator, TextInput } from "react-native-paper";
-import { StatusBar } from "expo-status-bar";
+import {
+  View,
+  ScrollView,
+  SafeAreaView,
+  Pressable,
+  StatusBar,
+  Text,
+} from "react-native";
+import { ActivityIndicator, IconButton, TextInput } from "react-native-paper";
+import * as EXPO from "expo-status-bar";
 
 import Modal from "react-native-modal";
 
-import axios from "axios";
 import SearchCard from "../components/SearchCard";
 import GameModal from "../components/Modal";
 import { fetchGame } from "../hooks/fetchGame";
-import { useTheme } from "@react-navigation/native";
+import { useNavigation, useTheme } from "@react-navigation/native";
 
 // AddGame component definition
 const AddGame = ({ route }) => {
@@ -25,13 +31,15 @@ const AddGame = ({ route }) => {
 
   const auth = route.params;
 
+  const navigation = useNavigation();
+
   // Initialize state for text input and games array
   const [text, setText] = React.useState("");
 
   // Return the JSX for the AddGame component
   return (
     <View>
-      <StatusBar style="auto" />
+      <EXPO.StatusBar style="auto" />
       <Modal
         isVisible={isModalVisible}
         onBackdropPress={() => setModalVisible(false)}
@@ -50,13 +58,42 @@ const AddGame = ({ route }) => {
       </Modal>
       <View
         style={{
-          backgroundColor: "#fff",
+          paddingTop: StatusBar.currentHeight,
           padding: 5,
-          borderBottomEndRadius: 10,
-          borderBottomStartRadius: 10,
+          borderBottomEndRadius: 15,
+          borderBottomStartRadius: 15,
+          backgroundColor: colors.secondary,
           elevation: 5,
+
+          minWidth: 360,
+          minHeight: 150,
         }}
       >
+        <View
+          style={{
+            paddingTop: 15,
+            flexDirection: "row",
+            alignItems: "center",
+            alignContent: "stretch",
+          }}
+        >
+          <IconButton
+            icon="arrow-left"
+            iconColor={colors.text}
+            onPress={() => navigation.goBack()}
+          />
+          <View style={{ flexGrow: 2, height: 40 }}>
+            <Text
+              style={{
+                fontSize: 24,
+                alignSelf: "center",
+              }}
+            >
+              Add Game
+            </Text>
+          </View>
+          <View style={{ width: 40 }}></View>
+        </View>
         {/* TextInput component for user to enter a game */}
         <TextInput
           mode="outlined"
@@ -67,9 +104,15 @@ const AddGame = ({ route }) => {
             setText(t);
             getGame(text, auth);
           }}
-          selectionColor={colors.accent}
-          cursorColor={colors.accent}
-          activeOutlineColor={colors.accent}
+          selectionColor={colors.text}
+          cursorColor={colors.text}
+          activeOutlineColor={colors.text}
+          textColor={colors.text}
+          left={<TextInput.Icon icon={"magnify"} />}
+          style={{
+            backgroundColor: colors.secondary,
+            margin: 5,
+          }}
         />
       </View>
       <View>

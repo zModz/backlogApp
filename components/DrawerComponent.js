@@ -14,8 +14,10 @@ import TabMenu from "./TabComponent";
 import CustomDrawer from "./customDrawer";
 
 const Drawer = createDrawerNavigator();
+import { useTheme } from "@react-navigation/native";
 
 function DrawerMenu() {
+  const colors = useTheme().colors;
   const { user } = useAuthContext();
   return (
     <Drawer.Navigator
@@ -31,6 +33,7 @@ function DrawerMenu() {
             <MaterialCommunityIcons
               name={focused ? "home" : "home-outline"}
               size={size}
+              color={colors.primary}
             />
           ),
           headerShown: false,
@@ -44,11 +47,10 @@ function DrawerMenu() {
             <MaterialCommunityIcons
               name={focused ? "gamepad-variant" : "gamepad-variant-outline"}
               size={size}
+              color={colors.primary}
             />
           ),
-          headerStyle: {
-            shadowColor: "black",
-          },
+          headerShown: false,
         }}
       />
       <Drawer.Screen
@@ -59,8 +61,10 @@ function DrawerMenu() {
             <MaterialCommunityIcons
               name={focused ? "chart-line" : "chart-line"}
               size={size}
+              color={colors.primary}
             />
           ),
+          headerTintColor: colors.text,
         }}
       />
       <Drawer.Screen
@@ -71,8 +75,10 @@ function DrawerMenu() {
             <MaterialCommunityIcons
               name={focused ? "cog" : "cog-outline"}
               size={size}
+              color={colors.primary}
             />
           ),
+          headerShown: false,
         }}
       />
     </Drawer.Navigator>

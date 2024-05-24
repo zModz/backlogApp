@@ -5,24 +5,26 @@ const commonColor = {
   },
 };
 
-const dark = {
+const light = {
   colors: {
-    primary: "#282828",
-    secondary: "#3E3E3E",
-    accent: "#A0282E",
-    border: "#AD4449",
-    text: "#6C6262",
+    primary: "#D0343C", // red
+    secondary: "#EAEAEA", // bone
+    accent: "#C76065", // wine
+    secondaryAccent: "#E9E6E6", // light bone
+    background: "#C7C7C7", // gray
+    text: "#000000", // black
     ...commonColor.colors,
   },
 };
 
-const light = {
+const dark = {
   colors: {
-    primary: "#EAEAEA",
-    secondary: "#E9E6E6",
-    accent: "#D0343C",
-    border: "#C76065",
-    text: "#C7C7C7",
+    primary: "#A0282E", // rose
+    secondary: "#282828", // coal
+    accent: "#AD4449", // light rose
+    secondaryAccent: "#3E3E3E", // light coal
+    background: "#6C6262", // dark gray
+    text: "#FFFFFF", // white
     ...commonColor.colors,
   },
 };
