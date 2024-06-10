@@ -75,7 +75,7 @@ const Login = ({ navigation }) => {
                   margin: 10,
                 }}
               >
-                {/* <Text style={{ color: "#e7195a" }}>{error}</Text> */}
+                <Text style={{ color: "#e7195a" }}>{error}</Text>
               </View>
             )}
             <TextInput

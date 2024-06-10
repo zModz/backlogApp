@@ -125,12 +125,12 @@ const AddGame = ({ route }) => {
             <ScrollView
               contentContainerStyle={{
                 paddingHorizontal: 15,
-                paddingBottom: 140,
+                paddingBottom: 330,
               }}
             >
-              {/* Map through the games array and display each game's name */}
+              {/* Map through the games array and display each game */}
               {game
-                .sort((a, b) => b.rating - a.rating)
+                .sort((a, b) => b.rating > a.rating)
                 .map((games, i) => (
                   <Pressable
                     key={i}

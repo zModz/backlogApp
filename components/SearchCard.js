@@ -1,5 +1,12 @@
 import { View, Image } from "react-native";
-import { Button, IconButton, Modal, Portal, Text } from "react-native-paper";
+import {
+  Button,
+  IconButton,
+  Menu,
+  Modal,
+  Portal,
+  Text,
+} from "react-native-paper";
 import React, { useState } from "react";
 import axios from "axios";
 import modal from "./Modal";
@@ -7,6 +14,11 @@ import { useTheme } from "@react-navigation/native";
 
 const SearchCard = ({ game }) => {
   const colors = useTheme().colors;
+  const [visible, setVisible] = React.useState(false);
+
+  const openMenu = () => setVisible(true);
+
+  const closeMenu = () => setVisible(false);
 
   var element = [];
   var genres;
@@ -81,6 +93,17 @@ const SearchCard = ({ game }) => {
         minHeight: 150,
       }}
     >
+      <IconButton
+        icon={"plus"}
+        iconColor={colors.secondaryAccent}
+        style={{
+          backgroundColor: colors.primary,
+          position: "absolute",
+          right: 5,
+          top: 5,
+        }}
+        onPress={() => {}}
+      />
       <View style={{ flexDirection: "row" }}>
         <Image
           source={{
@@ -120,23 +143,31 @@ const SearchCard = ({ game }) => {
               {date}
             </Text>
             <Text style={{ margin: 2, color: colors.text }}>•</Text>
-            <Text
-              variant="bodyMedium"
-              style={{
-                color:
-                  rate == "Bad"
-                    ? "red"
-                    : rate == "Unimpressive"
-                    ? "#FFD580"
-                    : rate == "Fair"
-                    ? "darkgreen"
-                    : rate == "Good"
-                    ? "green"
-                    : "",
-              }}
-            >
-              {rate} ({game.rating != undefined ? game.rating.toFixed() : ""}%)
-            </Text>
+            {rate !== undefined ? (
+              <Text
+                variant="bodyMedium"
+                style={{
+                  color:
+                    rate == "Bad"
+                      ? "red"
+                      : rate == "Unimpressive"
+                      ? "#FFD580"
+                      : rate == "Fair"
+                      ? "darkgreen"
+                      : rate == "Good"
+                      ? "green"
+                      : "",
+                }}
+              >
+                {rate} {game.rating.toFixed()}%
+              </Text>
+            ) : (
+              <>
+                <Text variant="bodyMedium" style={{ color: colors.text }}>
+                  UNRATED
+                </Text>
+              </>
+            )}
           </View>
         </View>
       </View>

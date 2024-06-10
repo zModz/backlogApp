@@ -182,7 +182,7 @@ const Backlog = () => {
         contentContainerStyle={{
           paddingLeft: 15,
           paddingRight: 15,
-          paddingBottom: 140,
+          paddingBottom: 275,
         }}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={fetchBacklog} />

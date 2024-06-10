@@ -46,7 +46,7 @@ function Main() {
           backgroundColor:
             theme === "dark"
               ? Colors.dark.colors.background
-              : Colors.dark.colors.background,
+              : Colors.light.colors.background,
         }}
       >
         <ActivityIndicator
@@ -54,7 +54,7 @@ function Main() {
           color={
             theme === "dark"
               ? Colors.dark.colors.primary
-              : Colors.dark.colors.primary
+              : Colors.light.colors.primary
           }
         />
       </View>

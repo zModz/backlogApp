@@ -9,7 +9,7 @@ import {
   TouchableWithoutFeedback,
   Alert,
 } from "react-native";
-import { ActivityIndicator, Button, Text } from "react-native-paper";
+import { ActivityIndicator, Button, Icon, Text } from "react-native-paper";
 
 import axios from "axios";
 
@@ -59,41 +59,6 @@ const GameModal = ({ game, auth }) => {
   };
 
   catEnum(game.category);
-
-  var status;
-  const statusEnum = (id) => {
-    switch (id) {
-      case 0:
-        status = "Released";
-        break;
-      case 2:
-        status = "Alpha";
-        break;
-      case 3:
-        status = "Beta";
-        break;
-      case 4:
-        status = "Early Access";
-        break;
-      case 5:
-        status = "Offline";
-        break;
-      case 6:
-        status = "Cancelled";
-        break;
-      case 6:
-        status = "Rumored";
-        break;
-      case 7:
-        status = "Delisted";
-        break;
-      default:
-        status = "UNKNOWN";
-        break;
-    }
-  };
-
-  statusEnum(game.category);
 
   var date;
   if (game.release_dates != undefined) {
@@ -148,7 +113,6 @@ const GameModal = ({ game, auth }) => {
           dev: dev[0].name,
           genres: genres,
           category: category,
-          status: status,
           release_date: date,
           images: {
             cover: "https:" + game.cover.url.replace("t_thumb", "t_cover_big"),
@@ -275,11 +239,19 @@ const GameModal = ({ game, auth }) => {
               <Text variant="bodyLarge" style={{ width: 215, color: "white" }}>
                 {genres}
               </Text>
-              <View style={{ flexDirection: "row" }}>
+              <View style={{ flexDirection: "row", alignItems: "center" }}>
                 {/* <Text variant='bodyMedium' style={{ color: 'white' }}>{category}</Text>
                                 <Text style={{ margin: 2, color: 'white' }}>•</Text> */}
-                <Text variant="bodyMedium" style={{ color: "white" }}>
-                  {date} ({status})
+                <Icon
+                  source={"calendar-clock-outline"}
+                  size={20}
+                  color="white"
+                />
+                <Text
+                  variant="bodyMedium"
+                  style={{ color: "white", marginLeft: 3 }}
+                >
+                  {date}
                 </Text>
               </View>
             </View>

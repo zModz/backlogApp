@@ -20,9 +20,9 @@ export const fetchGame = () => {
           Authorization: a.token_type + " " + a.access_token,
         },
         body:
-          'fields cover.url, name, release_dates.date, genres.name, category, involved_companies.*, screenshots.url, platforms, summary, status, rating; search "' +
+          'fields cover.url, name, release_dates.date, genres.name, category, involved_companies.*, screenshots.url, platforms, status, summary, rating; search "' +
           t +
-          '%";where rating != null & version_parent = null & category = (0,1,3,6,8);',
+          '%"; where version_parent = null & category = (0,1,3,6,8);',
       })
         .catch((err) => {
           Alert.alert("An Error Occured", err.message);

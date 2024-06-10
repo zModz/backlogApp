@@ -64,7 +64,7 @@ const BacklogCard = ({ game }) => {
           }
         >
           <Menu.Item
-            leadingIcon={"star-circle"}
+            leadingIcon={"clock-plus-outline"}
             onPress={() => {}}
             title="Add to Queue"
           />
