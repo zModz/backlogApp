@@ -69,33 +69,6 @@ const GameModal = ({ game, auth }) => {
     date = "UNKNOWN";
   }
 
-  useEffect(() => {
-    const getDev = async () => {
-      if (game.involved_companies != undefined) {
-        for (let j = 0; j < game.involved_companies.length; j++) {
-          if (game.involved_companies[j].developer == true) {
-            var dev = game.involved_companies[j].company;
-            await axios
-              .post(
-                "https://api.igdb.com/v4/companies",
-                "fields id,name; where id=" + dev + ";limit 10;",
-                {
-                  headers: {
-                    "Client-ID": process.env.EXPO_PUBLIC_CLIENTID,
-                    Authorization: auth.token_type + " " + auth.access_token,
-                  },
-                }
-              )
-              .then((res) => setDev(res.data))
-              .catch((err) => console.error(err));
-          }
-        }
-      }
-    };
-
-    getDev();
-  }, []);
-
   const addBacklogClick = async () => {
     if (!user) return;
 
@@ -133,7 +106,7 @@ const GameModal = ({ game, auth }) => {
 
   // console.log(dev[0])
 
-  if (game != undefined && dev[0] != undefined) {
+  if (game != undefined) {
     return (
       <View
         style={{
@@ -141,7 +114,6 @@ const GameModal = ({ game, auth }) => {
           borderTopRightRadius: 20,
           borderTopLeftRadius: 20,
           minHeight: 550,
-          paddingBottom: 20,
         }}
       >
         <ImageBackground
@@ -226,7 +198,7 @@ const GameModal = ({ game, auth }) => {
               </Text>
               <Text
                 variant="headlineSmall"
-                style={{ width: 215, fontWeight: "bold", color: "white" }}
+                style={{ width: 155, fontWeight: "bold", color: "white" }}
               >
                 {game.name != null ? game.name : "UNKNOWN"}
               </Text>
@@ -234,14 +206,14 @@ const GameModal = ({ game, auth }) => {
                 variant="titleMedium"
                 style={{ width: 215, color: "white" }}
               >
-                {dev[0] ? dev[0].name : "UNKNOWN"}
+                {game.involved_companies[0]
+                  ? game.involved_companies[0].name
+                  : "UNKNOWN"}
               </Text>
               <Text variant="bodyLarge" style={{ width: 215, color: "white" }}>
                 {genres}
               </Text>
               <View style={{ flexDirection: "row", alignItems: "center" }}>
-                {/* <Text variant='bodyMedium' style={{ color: 'white' }}>{category}</Text>
-                                <Text style={{ margin: 2, color: 'white' }}>•</Text> */}
                 <Icon
                   source={"calendar-clock-outline"}
                   size={20}
@@ -256,21 +228,23 @@ const GameModal = ({ game, auth }) => {
               </View>
             </View>
           </View>
-          <View>
-            <ScrollView>
-              <TouchableOpacity>
-                <Text variant="headlineSmall" style={{ fontWeight: "bold" }}>
-                  SUMMARY
-                </Text>
-                <Text variant="bodySmall" style={{ textAlign: "justify" }}>
-                  {game.summary}
-                </Text>
-                <Text variant="headlineSmall" style={{ fontWeight: "bold" }}>
-                  INFO
-                </Text>
-              </TouchableOpacity>
+          <TouchableWithoutFeedback>
+            <ScrollView nestedScrollEnabled={true}>
+              <Text variant="headlineSmall" style={{ fontWeight: "bold" }}>
+                SUMMARY
+              </Text>
+              <ScrollView nestedScrollEnabled={true} style={{ maxHeight: 100 }}>
+                <TouchableWithoutFeedback>
+                  <Text variant="bodySmall" style={{ textAlign: "justify" }}>
+                    {game.summary}
+                  </Text>
+                </TouchableWithoutFeedback>
+              </ScrollView>
+              <Text variant="headlineSmall" style={{ fontWeight: "bold" }}>
+                INFO
+              </Text>
             </ScrollView>
-          </View>
+          </TouchableWithoutFeedback>
           <Button
             mode="elevated"
             style={{
@@ -294,7 +268,7 @@ const GameModal = ({ game, auth }) => {
           backgroundColor: "#fff",
           borderTopRightRadius: 20,
           borderTopLeftRadius: 20,
-          margin: 10,
+          padding: 10,
         }}
       >
         <ActivityIndicator />

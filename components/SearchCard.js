@@ -8,7 +8,6 @@ import {
   Text,
 } from "react-native-paper";
 import React, { useState } from "react";
-import axios from "axios";
 import modal from "./Modal";
 import { useTheme } from "@react-navigation/native";
 
@@ -143,7 +142,8 @@ const SearchCard = ({ game }) => {
               {date}
             </Text>
             <Text style={{ margin: 2, color: colors.text }}>•</Text>
-            {rate !== undefined ? (
+            <Text>{game.involved_companies[0].name}</Text>
+            {/* {rate !== undefined ? (
               <Text
                 variant="bodyMedium"
                 style={{
@@ -167,7 +167,7 @@ const SearchCard = ({ game }) => {
                   UNRATED
                 </Text>
               </>
-            )}
+            )} */}
           </View>
         </View>
       </View>

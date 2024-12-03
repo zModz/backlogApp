@@ -2,71 +2,33 @@ import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
-  Alert,
   ScrollView,
   RefreshControl,
   StatusBar,
 } from "react-native";
+import { useNavigation, useTheme } from "@react-navigation/native";
+import { IconButton, TextInput, Chip, Tooltip } from "react-native-paper";
 
-import { useBacklogContext } from "../hooks/useBacklogContext";
 import { useAuthContext } from "../hooks/useAuthContext";
+import { useFetchBacklog } from "../hooks/useFetchBacklog";
 
-import {
-  IconButton,
-  TextInput,
-  SegmentedButtons,
-  FAB,
-  Chip,
-  Tooltip,
-} from "react-native-paper";
 import BacklogCard from "../components/BacklogCard";
 
-import { useNavigation, useTheme } from "@react-navigation/native";
-
 const Backlog = () => {
-  const [refreshing, setRefreshing] = useState(true);
+  const colors = useTheme().colors;
+  const navigation = useNavigation();
+
+  const { user } = useAuthContext();
+
   const [searchQuery, setSearchQuery] = React.useState("");
   const [query, setQuery] = useState([]);
 
-  const [value, setValue] = React.useState("in-queue");
-
-  // Get the backlog data and user info from contexts
-  const { backlogs, dispatch } = useBacklogContext();
-  const { user } = useAuthContext();
-
-  const colors = useTheme().colors;
-
-  const navigation = useNavigation();
-
-  const fetchBacklog = async () => {
-    const res = await fetch(
-      process.env.EXPO_PUBLIC_SERVER_IP + "/api/backlog/" + user.backlogID,
-      {
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-        },
-      }
-    );
-
-    if (!res.ok) {
-      console.log("ERROR");
-    }
-
-    const json = await res.json();
-
-    if (res.ok) {
-      dispatch({ type: "SET_BACKLOG", payload: json });
-
-      setQuery(json.backlog);
-    }
-
-    setRefreshing(false);
-  };
+  const { fetchBacklog, backlog, refreshing, error } = useFetchBacklog();
 
   const handleSearch = (t) => {
     setSearchQuery(t);
 
-    const filteredBacklog = backlogs.backlog.filter((game) =>
+    const filteredBacklog = backlog.filter((game) =>
       game.name.toLowerCase().includes(t.toLowerCase())
     );
 
@@ -74,10 +36,10 @@ const Backlog = () => {
   };
 
   useEffect(() => {
-    if (user) {
-      fetchBacklog();
-    }
-  }, []);
+    fetchBacklog(user);
+
+    setQuery(backlog);
+  }, [backlog]);
 
   return (
     <View>
@@ -90,7 +52,7 @@ const Backlog = () => {
           backgroundColor: colors.secondary,
           elevation: 5,
 
-          minWidth: 360,
+          minWidth: "100%",
           minHeight: 150,
         }}
       >
@@ -142,7 +104,7 @@ const Backlog = () => {
             cursorColor={colors.text}
             activeOutlineColor={colors.text}
             textColor={colors.text}
-            left={<TextInput.Icon icon={"magnify"} />}
+            // left={<TextInput.Icon icon={"magnify"} />}
             style={{
               backgroundColor: colors.secondary,
               flexGrow: 2,
@@ -188,24 +150,9 @@ const Backlog = () => {
           <RefreshControl refreshing={refreshing} onRefresh={fetchBacklog} />
         }
       >
-        {backlogs &&
+        {backlog &&
           query?.map((game) => <BacklogCard key={game.id} game={game} />)}
       </ScrollView>
-      {/* <FAB
-        icon="plus"
-        label="Add New Game"
-        style={{
-          position: "absolute",
-          height: 55,
-          margin: 16,
-          left: 0,
-          right: 0,
-          bottom: 15,
-          backgroundColor: colors.primary,
-        }}
-        color={colors.secondaryAccent}
-        onPress={() => console.log("Pressed")}
-      /> */}
     </View>
   );
 };

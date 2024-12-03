@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   ScrollView,
@@ -7,7 +7,12 @@ import {
   StatusBar,
   Text,
 } from "react-native";
-import { ActivityIndicator, IconButton, TextInput } from "react-native-paper";
+import {
+  ActivityIndicator,
+  Button,
+  IconButton,
+  TextInput,
+} from "react-native-paper";
 import * as EXPO from "expo-status-bar";
 
 import Modal from "react-native-modal";
@@ -16,25 +21,42 @@ import SearchCard from "../components/SearchCard";
 import GameModal from "../components/Modal";
 import { fetchGame } from "../hooks/fetchGame";
 import { useNavigation, useTheme } from "@react-navigation/native";
+import BacklogCard from "../components/BacklogCard";
 
 // AddGame component definition
 const AddGame = ({ route }) => {
+  const auth = route.params;
+  const navigation = useNavigation();
+  const colors = useTheme().colors;
+
   const [isModalVisible, setModalVisible] = React.useState(false);
   const [modalData, setmodalData] = React.useState([]);
-  const { game, isLoading, getGame } = fetchGame();
 
-  const colors = useTheme().colors;
+  // Initialize state for text input and games array
+  const [text, setText] = React.useState("");
+  const [query, setQuery] = useState([]);
+
+  const { game, isLoading, returnGame } = fetchGame();
 
   const toggleModal = () => {
     setModalVisible(!isModalVisible);
   };
 
-  const auth = route.params;
+  const handleSearch = (t) => {
+    setText(t);
 
-  const navigation = useNavigation();
+    const sortedSearch = game.sort(() => game.rating > game.rating);
 
-  // Initialize state for text input and games array
-  const [text, setText] = React.useState("");
+    setQuery(sortedSearch);
+  };
+
+  useEffect(() => {
+    returnGame(text, auth);
+
+    setQuery(game);
+  }, [game]);
+
+  console.log(text);
 
   // Return the JSX for the AddGame component
   return (
@@ -65,7 +87,7 @@ const AddGame = ({ route }) => {
           backgroundColor: colors.secondary,
           elevation: 5,
 
-          minWidth: 360,
+          width: "100%",
           minHeight: 150,
         }}
       >
@@ -101,8 +123,7 @@ const AddGame = ({ route }) => {
           placeholder="Halo: Combat Evolved"
           value={text}
           onChangeText={(t) => {
-            setText(t);
-            getGame(text, auth);
+            handleSearch(t);
           }}
           selectionColor={colors.text}
           cursorColor={colors.text}
@@ -129,19 +150,17 @@ const AddGame = ({ route }) => {
               }}
             >
               {/* Map through the games array and display each game */}
-              {game
-                .sort((a, b) => b.rating > a.rating)
-                .map((games, i) => (
-                  <Pressable
-                    key={i}
-                    onPress={() => {
-                      setmodalData(games);
-                      toggleModal();
-                    }}
-                  >
-                    <SearchCard key={i} game={games} />
-                  </Pressable>
-                ))}
+              {query?.map((g) => (
+                <Pressable
+                  key={g.id}
+                  onPress={() => {
+                    setmodalData(g);
+                    toggleModal();
+                  }}
+                >
+                  <BacklogCard key={g.id} game={g} />
+                </Pressable>
+              ))}
             </ScrollView>
           )}
         </SafeAreaView>

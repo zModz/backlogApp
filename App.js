@@ -36,6 +36,9 @@ function Main() {
 
   const theme = useColorScheme();
 
+  // TODO: Verify is token is expired
+  // console.log(user);
+
   if (loading) {
     return (
       <View
@@ -60,6 +63,8 @@ function Main() {
       </View>
     );
   }
+
+  console.log(user);
 
   return (
     <PaperProvider>

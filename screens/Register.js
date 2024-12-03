@@ -1,12 +1,22 @@
 // React
 import "react-native-gesture-handler";
 import { useState } from "react";
-import { Text, View, Alert, Image } from "react-native";
+import {
+  Text,
+  View,
+  Alert,
+  Image,
+  KeyboardAvoidingView,
+  Platform,
+  Keyboard,
+} from "react-native";
 import { StatusBar } from "expo-status-bar";
 
 // Components
 import { Button, Divider, TextInput } from "react-native-paper";
 import { useRegister } from "../hooks/useRegister";
+
+import { useTheme } from "@react-navigation/native";
 
 const Register = ({ navigation }) => {
   const [username, setUsername] = useState("");
@@ -26,106 +36,130 @@ const Register = ({ navigation }) => {
     }
   };
 
+  const colors = useTheme().colors;
+
   return (
-    <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
+    <View
+      style={{
+        flex: 1,
+        alignItems: "center",
+        justifyContent: "center",
+        backgroundColor: colors.background,
+      }}
+    >
       <StatusBar style="auto" />
-      <View
-        style={{
-          elevation: 5,
-          width: 350,
-          height: "auto",
-          backgroundColor: "#fff",
-          borderRadius: 15,
-          padding: 5,
-          justifyContent: "center",
-          flexDirection: "column",
-        }}
-      >
+      <View>
         <Image
           source={require("../assets/ARMORY2_ico.png")}
           style={{
-            height: 155,
-            width: 150,
+            height: 50,
+            width: 50,
             alignSelf: "center",
             margin: 15,
           }}
         />
-        {error && (
-          <View
-            style={{
-              padding: 10,
-              backgroundColor: "#ffefef",
-              borderRadius: 4,
-              borderStyle: "solid",
-              borderColor: "#e7195a",
-              borderWidth: 1,
-              margin: 10,
-            }}
-          >
-            <Text style={{ color: "#e7195a" }}>{error || Perror}</Text>
-          </View>
-        )}
-        <TextInput
-          mode="outlined"
-          label="Username"
-          onChangeText={(text) => setUsername(text)}
-          value={username}
-          style={{ margin: 10 }}
-        />
-        <TextInput
-          mode="outlined"
-          label="Email"
-          onChangeText={(text) => setEmail(text)}
-          value={email}
-          style={{ margin: 10 }}
-        />
-        <TextInput
-          mode="outlined"
-          label="Password"
-          onChangeText={(text) => setPassword(text)}
-          value={password}
-          secureTextEntry={!showPassword}
-          style={{ margin: 10 }}
-          right={
-            <TextInput.Icon
-              icon={showPassword ? "eye-off" : "eye"}
-              onPress={() => setShowPassword(!showPassword)}
-            />
-          }
-        />
-        <TextInput
-          mode="outlined"
-          label="Confirm Password"
-          onChangeText={(text) => setCPassword(text)}
-          value={cPassword}
-          secureTextEntry={!showPassword}
-          style={{ margin: 10 }}
-          right={
-            <TextInput.Icon
-              icon={showPassword ? "eye-off" : "eye"}
-              onPress={() => setShowPassword(!showPassword)}
-            />
-          }
-        />
-        <Button
-          mode="contained"
-          icon="account-plus"
-          loading={loading}
-          disabled={loading}
-          onPress={() => handleRegister()}
-          style={{ margin: 10 }}
-        >
-          Create Account
-        </Button>
-        <Button
-          mode="outlined"
-          icon={"login"}
-          style={{ margin: 10 }}
-          onPress={() => navigation.navigate("Login")}
-        >
-          Already a user
-        </Button>
       </View>
+      <KeyboardAvoidingView behavior={Platform.ios ? "padding" : "height"}>
+        <View
+          style={{
+            elevation: 5,
+            minWidth: "90%",
+            height: "auto",
+            backgroundColor: colors.secondary,
+            borderRadius: 15,
+            padding: 5,
+            justifyContent: "center",
+            flexDirection: "column",
+          }}
+        >
+          {error && (
+            <View
+              style={{
+                padding: 10,
+                backgroundColor: "#ffefef",
+                borderRadius: 4,
+                borderStyle: "solid",
+                borderColor: "#e7195a",
+                borderWidth: 1,
+                margin: 10,
+              }}
+            >
+              <Text style={{ color: "#e7195a" }}>{error || Perror}</Text>
+            </View>
+          )}
+          <TextInput
+            mode="outlined"
+            label="Username"
+            onChangeText={(text) => setUsername(text)}
+            value={username}
+            activeOutlineColor={colors.text}
+            error={error}
+            style={{ margin: 5 }}
+          />
+          <TextInput
+            mode="outlined"
+            label="Email"
+            onChangeText={(text) => setEmail(text)}
+            value={email}
+            activeOutlineColor={colors.text}
+            error={error}
+            style={{ margin: 5 }}
+          />
+          <TextInput
+            mode="outlined"
+            label="Password"
+            onChangeText={(text) => setPassword(text)}
+            value={password}
+            activeOutlineColor={colors.text}
+            error={error}
+            secureTextEntry={!showPassword}
+            style={{ margin: 5 }}
+            right={
+              <TextInput.Icon
+                icon={showPassword ? "eye-off" : "eye"}
+                onPress={() => setShowPassword(!showPassword)}
+              />
+            }
+          />
+          <TextInput
+            mode="outlined"
+            label="Confirm Password"
+            onChangeText={(text) => setCPassword(text)}
+            value={cPassword}
+            activeOutlineColor={colors.text}
+            error={error}
+            secureTextEntry={!showPassword}
+            style={{ margin: 5 }}
+            right={
+              <TextInput.Icon
+                icon={showPassword ? "eye-off" : "eye"}
+                onPress={() => setShowPassword(!showPassword)}
+              />
+            }
+          />
+          <Button
+            mode="contained"
+            icon="account-plus"
+            loading={loading}
+            disabled={loading}
+            buttonColor={colors.primary}
+            textColor={colors.secondaryAccent}
+            onPress={() => handleRegister()}
+            style={{ margin: 5 }}
+          >
+            Create Account
+          </Button>
+          <Button
+            mode="outlined"
+            icon={"login"}
+            textColor={colors.primary}
+            style={{ margin: 5, borderColor: colors.primary }}
+            onPress={() => navigation.navigate("Login")}
+          >
+            Already a user
+          </Button>
+        </View>
+      </KeyboardAvoidingView>
     </View>
   );
 };

@@ -12,6 +12,8 @@ export const useLogin = () => {
     setLoading(true);
     setError(null);
 
+    console.log(process.env.EXPO_PUBLIC_SERVER_IP);
+
     const res = await fetch(
       process.env.EXPO_PUBLIC_SERVER_IP + "/api/users/login",
       {
@@ -22,7 +24,7 @@ export const useLogin = () => {
         body: JSON.stringify({ email, password }),
       }
     ).catch((error) => {
-      Alert.alert("Request Timeout", error.message);
+      Alert.alert("Network Error", error.message);
     });
 
     const json = await res.json();

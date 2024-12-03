@@ -1,14 +1,13 @@
 import React from "react";
 import {
   View,
-  Image,
   ScrollView,
   ImageBackground,
   Pressable,
   StatusBar,
 } from "react-native";
 import * as EXPO from "expo-status-bar";
-import { Avatar, FAB, IconButton, Text, Badge } from "react-native-paper";
+import { Avatar, FAB, IconButton, Text } from "react-native-paper";
 import { useNavigation, useTheme } from "@react-navigation/native";
 
 const Home = ({ route }) => {
@@ -42,7 +41,7 @@ const Home = ({ route }) => {
           borderBottomLeftRadius: 15,
           borderBottomRightRadius: 15,
 
-          minWidth: 360,
+          minWidth: "100%",
           minHeight: 100,
         }}
       >

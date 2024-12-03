@@ -1,13 +1,12 @@
-import { View, Image } from "react-native";
+import { View, Image, Dimensions } from "react-native";
 import {
-  Button,
   IconButton,
   Menu,
-  Modal,
-  Portal,
   Text,
+  Icon,
 } from "react-native-paper";
-import React, { useState } from "react";
+import React from "react";
+import Styles from "../Styles";
 
 import { useTheme } from "@react-navigation/native";
 
@@ -16,22 +15,11 @@ const BacklogCard = ({ game }) => {
   const [visible, setVisible] = React.useState(false);
 
   const openMenu = () => setVisible(true);
-
   const closeMenu = () => setVisible(false);
 
   return (
     <View
-      style={{
-        backgroundColor: colors.secondary,
-        marginBottom: 10,
-        borderRadius: 10,
-        justifyContent: "center",
-        flexDirection: "column",
-        padding: 5,
-
-        minWidth: 340,
-        minHeight: 150,
-      }}
+      style={Styles.backlogCard}
     >
       <IconButton
         icon={"clock-plus-outline"}
@@ -39,9 +27,10 @@ const BacklogCard = ({ game }) => {
         style={{
           backgroundColor: colors.primary,
           position: "absolute",
-          right: 5,
-          top: 5,
+          right: 2,
+          top: 2,
         }}
+        size={14 * scale}
         onPress={() => {}}
       />
       <View style={{ zIndex: 100, position: "absolute", right: 0, bottom: 0 }}>
@@ -81,6 +70,8 @@ const BacklogCard = ({ game }) => {
             uri:
               game.images != undefined
                 ? game.images.cover
+                : game.cover != undefined
+                ? "https:" + game.cover.url.replace("t_thumb", "t_cover_big")
                 : "https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/No-Image-Placeholder.svg/624px-No-Image-Placeholder.svg.png",
           }}
           width={120}
@@ -96,28 +87,55 @@ const BacklogCard = ({ game }) => {
         >
           <Text
             variant="bodyMedium"
-            style={{ fontStyle: "italic", color: "#9b9b9b" }}
+            style={{
+              fontSize: 12 * scale,
+              fontStyle: "italic",
+              color: "#9b9b9b",
+            }}
           >
-            {game.category}
+            {game.category !== undefined ? game.category : ""}
           </Text>
           <Text
             variant="titleLarge"
-            style={{ width: 215, fontWeight: "bold", color: colors.text }}
+            style={{
+              fontSize: 14 * scale,
+              maxWidth: "65%",
+              height: "auto",
+              fontWeight: "bold",
+              color: colors.text,
+              lineHeight: 20,
+              textAlignVertical: "center",
+            }}
           >
             {game.name != null ? game.name : "UNKNOWN"}
           </Text>
-          <Text variant="bodyLarge" style={{ width: 215, color: colors.text }}>
-            {game.genres}
+          <Text
+            variant="bodyLarge"
+            style={{ fontSize: 12 * scale, width: 215, color: colors.text }}
+          >
+            <Icon source={"puzzle"} />
+            {game.genres !== undefined ? game.genres : ""}
           </Text>
-          <View style={{ flexDirection: "row", alignItems: "center" }}>
-            <Text variant="bodyMedium" style={{ color: colors.text }}>
-              {game.dev}
-            </Text>
-            <Text style={{ margin: 2, color: colors.text }}>•</Text>
-            <Text variant="bodyMedium" style={{ color: colors.text }}>
-              {game.release_date}
-            </Text>
-          </View>
+          <Text
+            variant="bodyMedium"
+            style={{ fontSize: 12 * scale, color: colors.text }}
+          >
+            <Icon source={"calendar-clock-outline"} />
+            {game.release_date !== undefined ? game.release_date : ""}
+          </Text>
+          <Text
+            variant="bodyMedium"
+            style={{
+              fontSize: 12 * scale,
+              color: colors.text,
+              maxWidth: "65%",
+            }}
+          >
+            <Icon source={"code-not-equal-variant"} />
+            {game.dev !== undefined
+              ? game.dev
+              : game.involved_companies[0].name}
+          </Text>
           {/* <Button
             mode="contained"
             icon={"star-circle"}
