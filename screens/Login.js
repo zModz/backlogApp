@@ -42,21 +42,12 @@ const Login = ({ navigation }) => {
       >
         <StatusBar style="auto" />
 
-        <Image
-          source={require("../assets/ARMORY2_ico.png")}
-          style={{
-            height: 50,
-            width: 50,
-            alignSelf: "center",
-            margin: 15,
-          }}
-        />
         <KeyboardAvoidingView behavior={Platform.ios ? "padding" : "height"}>
           <View
             style={{
               elevation: 5,
-              minWidth: "90%",
-              height: "auto",
+              minWidth: 320,
+              maxHeight: 450,
               backgroundColor: colors.secondary,
               borderRadius: 15,
               padding: 5,
@@ -64,6 +55,15 @@ const Login = ({ navigation }) => {
               flexDirection: "column",
             }}
           >
+            <Image
+              source={require("../assets/ARMORY2_ico.png")}
+              style={{
+                height: 145,
+                width: 140,
+                alignSelf: "center",
+                margin: 15,
+              }}
+            />
             {error && (
               <View
                 style={{

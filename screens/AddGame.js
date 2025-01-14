@@ -158,7 +158,7 @@ const AddGame = ({ route }) => {
                     toggleModal();
                   }}
                 >
-                  <BacklogCard key={g.id} game={g} />
+                  <SearchCard key={g.id} game={g} />
                 </Pressable>
               ))}
             </ScrollView>

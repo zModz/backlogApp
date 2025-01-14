@@ -48,23 +48,13 @@ const Register = ({ navigation }) => {
       }}
     >
       <StatusBar style="auto" />
-      <View>
-        <Image
-          source={require("../assets/ARMORY2_ico.png")}
-          style={{
-            height: 50,
-            width: 50,
-            alignSelf: "center",
-            margin: 15,
-          }}
-        />
-      </View>
+      <View></View>
       <KeyboardAvoidingView behavior={Platform.ios ? "padding" : "height"}>
         <View
           style={{
             elevation: 5,
-            minWidth: "90%",
-            height: "auto",
+            minWidth: 320,
+            maxHeight: 460,
             backgroundColor: colors.secondary,
             borderRadius: 15,
             padding: 5,
@@ -72,6 +62,15 @@ const Register = ({ navigation }) => {
             flexDirection: "column",
           }}
         >
+          <Image
+            source={require("../assets/ARMORY2_ico.png")}
+            style={{
+              height: 52,
+              width: 50,
+              alignSelf: "center",
+              margin: 15,
+            }}
+          />
           {error && (
             <View
               style={{

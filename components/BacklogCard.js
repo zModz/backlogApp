@@ -1,4 +1,4 @@
-import { View, Image, Dimensions } from "react-native";
+import { View, Image } from "react-native";
 import {
   IconButton,
   Menu,
@@ -30,7 +30,7 @@ const BacklogCard = ({ game }) => {
           right: 2,
           top: 2,
         }}
-        size={14 * scale}
+        size={14}
         onPress={() => {}}
       />
       <View style={{ zIndex: 100, position: "absolute", right: 0, bottom: 0 }}>
@@ -88,7 +88,7 @@ const BacklogCard = ({ game }) => {
           <Text
             variant="bodyMedium"
             style={{
-              fontSize: 12 * scale,
+              fontSize: 12,
               fontStyle: "italic",
               color: "#9b9b9b",
             }}
@@ -98,7 +98,7 @@ const BacklogCard = ({ game }) => {
           <Text
             variant="titleLarge"
             style={{
-              fontSize: 14 * scale,
+              fontSize: 14,
               maxWidth: "65%",
               height: "auto",
               fontWeight: "bold",
@@ -111,14 +111,14 @@ const BacklogCard = ({ game }) => {
           </Text>
           <Text
             variant="bodyLarge"
-            style={{ fontSize: 12 * scale, width: 215, color: colors.text }}
+            style={{ fontSize: 12, width: 215, color: colors.text }}
           >
             <Icon source={"puzzle"} />
             {game.genres !== undefined ? game.genres : ""}
           </Text>
           <Text
             variant="bodyMedium"
-            style={{ fontSize: 12 * scale, color: colors.text }}
+            style={{ fontSize: 12, color: colors.text }}
           >
             <Icon source={"calendar-clock-outline"} />
             {game.release_date !== undefined ? game.release_date : ""}
@@ -126,7 +126,7 @@ const BacklogCard = ({ game }) => {
           <Text
             variant="bodyMedium"
             style={{
-              fontSize: 12 * scale,
+              fontSize: 12,
               color: colors.text,
               maxWidth: "65%",
             }}
