@@ -1,26 +1,29 @@
 import { View, Image } from "react-native";
-import {
-  IconButton,
-  Menu,
-  Text,
-  Icon,
-} from "react-native-paper";
+import { IconButton, Menu, Text, Icon } from "react-native-paper";
 import React from "react";
 import Styles from "../Styles";
 
 import { useTheme } from "@react-navigation/native";
+import CheckBacklog from "../hooks/checkBacklog";
+import { useAuthContext } from "../hooks/useAuthContext";
 
 const BacklogCard = ({ game }) => {
+  const { user } = useAuthContext();
   const colors = useTheme().colors;
   const [visible, setVisible] = React.useState(false);
 
   const openMenu = () => setVisible(true);
   const closeMenu = () => setVisible(false);
 
+  const checkIfGameInBacklog = async () => {
+    const isInBacklog = await CheckBacklog(user, game.id);
+    console.log(isInBacklog ? `Game ${game.name} is in backlog` : `Game ${game.name} is not in backlog`);
+  };
+
+  checkIfGameInBacklog();
+
   return (
-    <View
-      style={Styles.backlogCard}
-    >
+    <View style={Styles.backlogCard}>
       <IconButton
         icon={"clock-plus-outline"}
         iconColor={colors.secondaryAccent}
@@ -70,8 +73,6 @@ const BacklogCard = ({ game }) => {
             uri:
               game.images != undefined
                 ? game.images.cover
-                : game.cover != undefined
-                ? "https:" + game.cover.url.replace("t_thumb", "t_cover_big")
                 : "https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/No-Image-Placeholder.svg/624px-No-Image-Placeholder.svg.png",
           }}
           width={120}
@@ -121,7 +122,11 @@ const BacklogCard = ({ game }) => {
             style={{ fontSize: 12, color: colors.text }}
           >
             <Icon source={"calendar-clock-outline"} />
-            {game.release_date !== undefined ? game.release_date : ""}
+            {game.release_date == undefined
+              ? "N/A"
+              : game.release_date.length > 1
+              ? game.release_date[0] + "*"
+              : game.release_date[0]}
           </Text>
           <Text
             variant="bodyMedium"
@@ -132,20 +137,8 @@ const BacklogCard = ({ game }) => {
             }}
           >
             <Icon source={"code-not-equal-variant"} />
-            {game.dev !== undefined
-              ? game.dev
-              : game.involved_companies[0].name}
+            {game.developer[0].name}
           </Text>
-          {/* <Button
-            mode="contained"
-            icon={"star-circle"}
-            style={{
-              backgroundColor: colors.primary,
-              marginVertical: 5,
-            }}
-          >
-            Add to Queue
-          </Button> */}
         </View>
       </View>
     </View>

@@ -1,109 +1,106 @@
-import { useState } from "react";
-import { Alert } from "react-native";
+import { useState, useEffect } from "react";
+import { fetchData } from "../config/apiUtils"; // Adjust the path as needed
 
-export const fetchGame = () => {
-  const [timer, setTimer] = useState(null);
-  const [game, setGame] = useState([]);
+const API_URL = "https://api.igdb.com/v4";
+
+const useGame = () => {
+  const [games, setGames] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
 
-  const getDev = async (d, a) => {
-    const res = await fetch("https://api.igdb.com/v4/companies", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Client-ID": process.env.EXPO_PUBLIC_CLIENTID,
-        Authorization: a.token_type + " " + a.access_token,
-      },
-      body: "fields id,name; where id=" + d + ";limit 10;",
-    }).catch((err) => {
-      Alert.alert("An Error Occured", err.message);
-    }); // Log any errors
-
-    const json = await res.json();
-
-    if (res.ok) {
-      return json;
-    }
+  const getDeveloper = async (developerId, token) => {
+    const body = `fields id,company; where id=${developerId};limit 10;`;
+    return fetchData(API_URL, "involved_companies", body, token);
   };
 
-  const getPlat = async (p, a) => {
-    const res = await fetch("https://api.igdb.com/v4/platforms", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Client-ID": process.env.EXPO_PUBLIC_CLIENTID,
-        Authorization: a.token_type + " " + a.access_token,
-      },
-      body: "fields id,name; where id=" + p + ";limit 10;",
-    }).catch((err) => {
-      Alert.alert("An Error Occured", err.message);
-    }); // Log any errors
-
-    const json = await res.json();
-
-    if (res.ok) {
-      return json;
-    }
+  const getCompany = async (companyId, token) => {
+    const body = `fields id,name; where id=${companyId};limit 10;`;
+    return fetchData(API_URL, "companies", body, token);
   };
 
-  const getGame = async (t, a) => {
-    const res = await fetch("https://api.igdb.com/v4/games", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Client-ID": process.env.EXPO_PUBLIC_CLIENTID,
-        Authorization: a.token_type + " " + a.access_token,
-      },
-      body:
-        'fields cover.url, name, release_dates.date, genres.name, category, involved_companies.*, screenshots.url, platforms, status, summary, rating; search "' +
-        t +
-        '%"; where version_parent = null & category = (0,1,3,6,8);',
-    }).catch((err) => {
-      Alert.alert("An Error Occured", err.message);
-    }); // Log any errors
-
-    const json = await res.json();
-
-    if (res.ok) {
-      return json;
-    }
+  const getPlatform = async (platformId, token) => {
+    const body = `fields id,name; where id=${platformId};limit 10;`;
+    return fetchData(API_URL, "platforms", body, token);
   };
 
-  const returnGame = async (t, a) => {
+  const convertDate = (date) => {
+    return new Date(date * 1000).toLocaleDateString("pt-PT");
+  };
+
+  const getCategory = (id) => {
+    const categories = {
+      0: "Game",
+      1: "DLC",
+      3: "Bundle",
+      6: "Episode",
+      8: "Remake",
+    };
+
+    // Return the category if it exists, otherwise default to "N/A"
+    return categories[id] || "N/A";
+  };
+
+  const fetchGameData = async (token, body) => {
     setIsLoading(true);
+    const gamesData = await fetchData(API_URL, "games", body, token);
 
-    clearTimeout(timer);
+    if (gamesData) {
+      const gamesWithDevAndPlatform = await Promise.all(
+        gamesData.map(async (game) => {
+          const developerId =
+            game.involved_companies?.map(
+              (involvedCompany) => involvedCompany.id
+            ) || "N/A";
+          const companyId =
+            game.involved_companies?.map(
+              (involvedCompany) => involvedCompany.company
+            ) || "N/A";
+          const platformIds = game.platforms;
 
-    const newTimer = setTimeout(async () => {
-      let g = await getGame(t, a);
+          await Promise.all(developerId.map((id) => getDeveloper(id, token)));
 
-      for (let i = 0; i < g.length; i++) {
-        if (g[i].involved_companies != undefined) {
-          for (let j = 0; j < g[i].involved_companies.length; j++) {
-            if (g[i].involved_companies[j].developer == true) {
-              var dev = g[i].involved_companies[j].company;
+          const companyData = await Promise.all(
+            companyId.map((id) => getCompany(id, token))
+          );
 
-              g[i].involved_companies = await getDev(dev, a);
-            }
-          }
-        } else {
-          g[i].involved_companies = "Unknown";
-        }
+          const platformData = await Promise.all(
+            platformIds.map((id) => getPlatform(id, token))
+          );
 
-        if (g[i].platforms != undefined) {
-          g[i].platforms.forEach(async (element, index, arr) => {
-            arr[index] = await getPlat(element, a);
-          });
-        }
-      }
+          const releaseDate =
+            game.release_dates?.map((date) => convertDate(date.date)) || "N/A";
 
-      setGame(g);
-    }, 10);
+          const genres =
+            game.genres && game.genres.length > 0
+              ? game.genres.map((genre) => genre.name).join(", ")
+              : "N/A";
 
-    setTimer(newTimer);
+          return {
+            id: game.id,
+            name: game.name,
+            developer: companyData.map((data) => data[0]),
+            platforms: platformData.map((data) => data[0]),
+            genres: genres,
+            release_date: releaseDate,
+            category: getCategory(game.category),
+            summary: game.summary || "No Summary Available",
+            rating: game.rating,
+            images: {
+              cover: game.cover?.url
+                ? `https:${game.cover.url.replace("t_thumb", "t_cover_big")}`
+                : "", // Safe URL formatting
+              screenshots: game.screenshots,
+            },
+          };
+        })
+      );
 
-    setIsLoading(false);
+      setIsLoading(false);
+      return gamesWithDevAndPlatform;
+    }
   };
 
-  return { game, isLoading, returnGame };
+  return { games, isLoading, error, fetchGameData };
 };
+
+export default useGame;

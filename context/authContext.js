@@ -2,6 +2,7 @@ import { createContext, useReducer, useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import { getAuthTwitch } from "../config/twitchAuth";
+import { ActivityIndicator } from "react-native-paper";
 
 export const AuthContext = createContext();
 
@@ -20,37 +21,41 @@ export const AuthContextProvider = ({ children }) => {
   const [state, dispatch] = useReducer(authReducer, { user: null });
   const [auth, setAuth] = useState([]);
 
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
 
   useEffect(() => {
-    setLoading(true);
-    AsyncStorage.getItem("user").then((res) => {
-      dispatch({ type: "USER_LOGIN", payload: JSON.parse(res) });
-      setLoading(false);
+    const initializeAuth = async () => {
+      try {
+        setLoading(true);
 
-      // if (res) {
-      //   user = JSON.parse(res);
-      //   const decodedJwt = JSON.parse(atob(user.token.split(".")[1]));
+        // Fetch user from AsyncStorage
+        const storedUser = await AsyncStorage.getItem("user");
+        if (storedUser) {
+          dispatch({ type: "USER_LOGIN", payload: JSON.parse(storedUser) });
+        }
 
-      //   if (decodedJwt.exp * 1000 < Date.now()) {
-      //     dispatch({ type: "USER_LOGOUT" });
-      //     setLoading(false);
-      //   } else {
-      //   }
-      // }
-    });
+        // Fetch auth details from getAuthTwitch
+        const authResponse = await getAuthTwitch();
+        setAuth(authResponse);
+      } catch (error) {
+        console.error("Error initializing auth:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-    getAuthTwitch().then((res) => {
-      setAuth(res);
-      setLoading(false);
-    });
-  }, [dispatch, AsyncStorage]);
+    initializeAuth();
+  }, []);
 
-  // console.log("AuthContext state: ", state);
+  console.log("AuthContext state: ", state);
+
+  if (loading) {
+    return <ActivityIndicator size="large" />;
+  }
 
   return (
-    <AuthContext.Provider value={{ ...state, dispatch, loading, auth }}>
+    <AuthContext.Provider value={{ ...state, dispatch, auth }}>
       {children}
     </AuthContext.Provider>
   );

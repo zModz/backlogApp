@@ -57,8 +57,8 @@ const SearchCard = ({ game }) => {
   catEnum(game.category);
 
   var date;
-  if (game.release_dates != undefined) {
-    let dateTime = game.release_dates[0].date;
+  if (game.release_date != undefined) {
+    let dateTime = game.release_date[0].date;
     const currentDate = new Date(dateTime * 1000);
     date = currentDate.toLocaleDateString("pt-PT");
   } else {
@@ -107,8 +107,8 @@ const SearchCard = ({ game }) => {
         <Image
           source={{
             uri:
-              game.cover != undefined
-                ? "https:" + game.cover.url.replace("t_thumb", "t_cover_big")
+              game.images.cover != undefined
+                ? "https:" + game.images.cover.url.replace("t_thumb", "t_cover_big")
                 : "https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/No-Image-Placeholder.svg/624px-No-Image-Placeholder.svg.png",
           }}
           width={120}
@@ -142,7 +142,7 @@ const SearchCard = ({ game }) => {
               {date}
             </Text>
             <Text style={{ margin: 2, color: colors.text }}>•</Text>
-            <Text>{game.involved_companies[0].name}</Text>
+            <Text>{game.developer[0].name}</Text>
             {/* {rate !== undefined ? (
               <Text
                 variant="bodyMedium"

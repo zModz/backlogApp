@@ -30,7 +30,8 @@ import Notifications from "./screens/Notifications";
 
 const Stack = createStackNavigator();
 
-function Main() {
+const Main = React.memo(() => {
+  console.log("Main");
   const { user, loading, auth } = useAuthContext();
   const { logout } = useLogout();
 
@@ -39,32 +40,7 @@ function Main() {
   // TODO: Verify is token is expired
   // console.log(user);
 
-  if (loading) {
-    return (
-      <View
-        style={{
-          flex: 1,
-          justifyContent: "center",
-          alignItems: "center",
-          backgroundColor:
-            theme === "dark"
-              ? Colors.dark.colors.background
-              : Colors.light.colors.background,
-        }}
-      >
-        <ActivityIndicator
-          size="large"
-          color={
-            theme === "dark"
-              ? Colors.dark.colors.primary
-              : Colors.light.colors.primary
-          }
-        />
-      </View>
-    );
-  }
-
-  console.log(user);
+  console.log("User: ", user);
 
   return (
     <PaperProvider>
@@ -113,7 +89,7 @@ function Main() {
       </Portal>
     </PaperProvider>
   );
-}
+});
 
 // This is the default export of a React functional component named "App"
 export default function App() {

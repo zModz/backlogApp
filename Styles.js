@@ -15,6 +15,8 @@ export default styles = StyleSheet.create({
     backgroundColor: "#C7C7C7",
   },
   backlogCard: {
+    flex: 1,
+    flexGrow: 1,
     backgroundColor: "#EAEAEA",
     borderLeftWidth: 3,
     borderLeftColor: "#D0343C",
