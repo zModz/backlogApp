@@ -1,7 +1,7 @@
 import React from "react";
 import { View, Text, StatusBar, ScrollView } from "react-native";
 
-import { useNavigation, useTheme } from "@react-navigation/native";
+import { useNavigation } from "@react-navigation/native";
 import {
   Icon,
   IconButton,
@@ -9,54 +9,42 @@ import {
   TextInput,
   Tooltip,
 } from "react-native-paper";
+import * as EXPO from "expo-status-bar";
+
+import { useTheme } from "../context/themeContext";
+import { createStyles } from "../Styles";
 
 const Settings = () => {
-  const [expanded, setExpanded] = React.useState(true);
+  // theme
+  const { theme, toggleTheme } = useTheme();
+  const styles = createStyles(theme);
+  // console.log(theme);
 
-  const handlePress = () => setExpanded(!expanded);
-  const colors = useTheme().colors;
   const navigation = useNavigation();
 
   const [isSwitchOn, setIsSwitchOn] = React.useState(false);
   const onToggleSwitch = () => setIsSwitchOn(!isSwitchOn);
 
   return (
-    <View>
-      <View
-        style={{
-          paddingTop: StatusBar.currentHeight,
-          padding: 5,
-          borderBottomEndRadius: 15,
-          borderBottomStartRadius: 15,
-          backgroundColor: colors.secondary,
-          elevation: 5,
-
-          minWidth: 360,
-          minHeight: 100,
-        }}
-      >
+    <View style={styles.container}>
+      <EXPO.StatusBar style={theme.theme === "dark" ? "light" : "dark"} />
+      <View style={styles.appHeader}>
         <View
           style={{
-            paddingTop: 15,
+            height: 70,
             flexDirection: "row",
             alignItems: "center",
-            alignContent: "stretch",
+            alignContent: "space-between",
           }}
         >
           <IconButton
             icon="menu"
-            iconColor={colors.text}
+            size={24}
+            iconColor={theme.colors.text}
             onPress={() => navigation.openDrawer()}
           />
-          <View style={{ flexGrow: 2, height: 40 }}>
-            <Text
-              style={{
-                fontSize: 24,
-                alignSelf: "center",
-              }}
-            >
-              Settings
-            </Text>
+          <View style={{ flexGrow: 2, height: 40, justifyContent: "center" }}>
+            <Text style={styles.headerText}>Settings</Text>
           </View>
           <View style={{ width: 40 }}></View>
         </View>
@@ -73,21 +61,19 @@ const Settings = () => {
             justifyContent: "space-between",
             alignItems: "center",
             marginVertical: 10,
-            minWidth: 340,
+            minWidth: "100%",
             minHeight: 50,
-
-            borderWidth: 1,
           }}
         >
-          <Text>Theme</Text>
+          <Text style={{ color: theme.colors.text }}>Theme</Text>
           <IconButton
             mode="outlined"
-            selected={isSwitchOn}
-            icon={isSwitchOn ? "weather-sunny" : "weather-night"}
-            containerColor={isSwitchOn ? "#87CEEB" : "#131862"}
-            iconColor={isSwitchOn ? "yellow" : "white"}
+            selected={theme.theme}
+            icon={theme.theme === "light" ? "weather-sunny" : "weather-night"}
+            containerColor={theme.theme === "light" ? "#87CEEB" : "#131862"}
+            iconColor={theme.theme === "light" ? "yellow" : "white"}
             size={20}
-            onPress={onToggleSwitch}
+            onPress={toggleTheme}
             animated="true"
             style={{ borderWidth: 0 }}
           />

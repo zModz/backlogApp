@@ -2,18 +2,19 @@
 // React
 import "react-native-gesture-handler";
 import * as React from "react";
-import { View, useColorScheme } from "react-native";
+import { useColorScheme } from "react-native";
 
 // Custom Packages
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
-import { ActivityIndicator, PaperProvider, Portal } from "react-native-paper";
-import Colors from "./theme/Colors";
+import { PaperProvider, Portal } from "react-native-paper";
+
 
 // Custom Screens
 import AddGame from "./screens/AddGame";
 import Login from "./screens/Login";
 import Register from "./screens/Register";
+import Notifications from "./screens/Notifications";
 
 // Components
 import DrawerMenu from "./components/DrawerComponent";
@@ -21,11 +22,11 @@ import DrawerMenu from "./components/DrawerComponent";
 // Context
 import { AuthContextProvider } from "./context/authContext";
 import { BacklogCTXProvider } from "./context/backlogContext";
+import { ThemeProvider } from "./context/themeContext"
 
 // Hooks
 import { useAuthContext } from "./hooks/useAuthContext";
 import { useLogout } from "./hooks/useLogout";
-import Notifications from "./screens/Notifications";
 //#endregion
 
 const Stack = createStackNavigator();
@@ -35,8 +36,6 @@ const Main = React.memo(() => {
   const { user, loading, auth } = useAuthContext();
   const { logout } = useLogout();
 
-  const theme = useColorScheme();
-
   // TODO: Verify is token is expired
   // console.log(user);
 
@@ -45,9 +44,7 @@ const Main = React.memo(() => {
   return (
     <PaperProvider>
       <Portal>
-        <NavigationContainer
-          theme={theme === "dark" ? Colors.dark : Colors.light}
-        >
+        <NavigationContainer>
           <Stack.Navigator>
             {user ? (
               <>
@@ -101,7 +98,9 @@ export default function App() {
   return (
     <AuthContextProvider>
       <BacklogCTXProvider>
-        <Main />
+        <ThemeProvider>
+          <Main />
+        </ThemeProvider>
       </BacklogCTXProvider>
     </AuthContextProvider>
   );

@@ -6,6 +6,7 @@ import Styles from "../Styles";
 import { useTheme } from "@react-navigation/native";
 import CheckBacklog from "../hooks/checkBacklog";
 import { useAuthContext } from "../hooks/useAuthContext";
+import BaseCard from "./BaseCard";
 
 const BacklogCard = ({ game }) => {
   const { user } = useAuthContext();
@@ -17,13 +18,17 @@ const BacklogCard = ({ game }) => {
 
   const checkIfGameInBacklog = async () => {
     const isInBacklog = await CheckBacklog(user, game.id);
-    console.log(isInBacklog ? `Game ${game.name} is in backlog` : `Game ${game.name} is not in backlog`);
+    console.log(
+      isInBacklog
+        ? `Game ${game.name} is in backlog`
+        : `Game ${game.name} is not in backlog`
+    );
   };
 
   checkIfGameInBacklog();
 
   return (
-    <View style={Styles.backlogCard}>
+    <BaseCard>
       <IconButton
         icon={"clock-plus-outline"}
         iconColor={colors.secondaryAccent}
@@ -141,7 +146,7 @@ const BacklogCard = ({ game }) => {
           </Text>
         </View>
       </View>
-    </View>
+    </BaseCard>
   );
 };
 

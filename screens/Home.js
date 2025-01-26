@@ -1,86 +1,80 @@
 import React from "react";
-import {
-  View,
-  ScrollView,
-  ImageBackground,
-  Pressable,
-  StatusBar,
-} from "react-native";
+import { View, ScrollView, ImageBackground, Pressable } from "react-native";
 import * as EXPO from "expo-status-bar";
 import { Avatar, FAB, IconButton, Text } from "react-native-paper";
-import { useNavigation, useTheme } from "@react-navigation/native";
+import { useNavigation } from "@react-navigation/native";
+
+import { useTheme } from "../context/themeContext";
+import { createStyles } from "../Styles";
 
 const Home = ({ route }) => {
   const [state, setState] = React.useState({ open: false });
-  const { open } = state;
   const onStateChange = ({ open }) => setState({ open });
+  const { open } = state;
 
   const navigation = useNavigation();
 
   const { username } = route.params;
 
-  const colors = useTheme().colors;
+  // theme
+  const { theme } = useTheme();
+  const styles = createStyles(theme);
 
   return (
-    <View
-      style={{
-        flex: 1,
-        backgroundColor: colors.background,
-      }}
-    >
-      <EXPO.StatusBar style="auto" />
-      <View
-        style={{
-          paddingTop: StatusBar.currentHeight,
-          padding: 5,
-          marginBottom: 10,
-          flexDirection: "row",
-          alignItems: "center",
-          justifyContent: "space-between",
-          backgroundColor: colors.secondary,
-          borderBottomLeftRadius: 15,
-          borderBottomRightRadius: 15,
-
-          minWidth: "100%",
-          minHeight: 100,
-        }}
-      >
-        <View style={{ flexDirection: "row", alignItems: "center" }}>
-          <Pressable onPress={() => navigation.openDrawer()}>
-            <Avatar.Text
-              size={40}
-              label={username[0]}
-              style={{
-                margin: 10,
-                backgroundColor: colors.accent,
-              }}
-              color={colors.secondaryAccent}
-            />
-          </Pressable>
-          {/* <IconButton icon={"menu"} onPress={navigation.openDrawer} /> */}
-          <View style={{ flexDirection: "column" }}>
-            <Text
-              variant="titleMedium"
-              style={{ color: colors.text, fontWeight: "bold" }}
-            >
-              Hello!
-            </Text>
-            <Text style={{ color: colors.text }}>@{username}</Text>
+    <View style={styles.container}>
+      <EXPO.StatusBar style={theme.theme === "dark" ? "light" : "dark"} />
+      <View style={styles.appHeader}>
+        <View
+          style={{
+            paddingTop: 10,
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}
+        >
+          <View style={{ flexDirection: "row", alignItems: "center" }}>
+            <Pressable onPress={() => navigation.openDrawer()}>
+              <Avatar.Text
+                size={40}
+                label={username[0]}
+                style={{
+                  margin: 10,
+                  backgroundColor: theme.colors.accent,
+                }}
+                color={theme.colors.text}
+              />
+            </Pressable>
+            {/* <IconButton icon={"menu"} onPress={navigation.openDrawer} /> */}
+            <View style={{ flexDirection: "column" }}>
+              <Text
+                style={{
+                  color: theme.colors.text,
+                  fontWeight: "bold",
+                  fontSize: 16,
+                }}
+              >
+                Hello!
+              </Text>
+              <Text style={{ color: theme.colors.text, fontSize: 12 }}>
+                @{username}
+              </Text>
+            </View>
           </View>
-        </View>
-        <View>
-          <IconButton
-            icon={"bell"}
-            iconColor={colors.text}
-            onPress={() => navigation.navigate("Notifications")}
-            style={{ margin: 10 }}
-          />
-          {/* <Badge style={{ position: "absolute", top: 4, right: 0 }}>1</Badge> */}
+          <View>
+            <IconButton
+              icon={"bell"}
+              size={24}
+              iconColor={theme.colors.text}
+              onPress={() => navigation.navigate("Notifications")}
+              style={{ margin: 10 }}
+            />
+            {/* <Badge style={{ position: "absolute", top: 4, right: 0 }}>1</Badge> */}
+          </View>
         </View>
       </View>
 
       <View style={{ padding: 10 }}>
-        <Text variant="headlineLarge" style={{ color: colors.text }}>
+        <Text variant="headlineLarge" style={{ color: theme.colors.text }}>
           Discover
         </Text>
         <ScrollView horizontal={true}>
@@ -104,18 +98,10 @@ const Home = ({ route }) => {
                 justifyContent: "flex-end",
                 alignItems: "center",
               }}
-            >
-              <Text variant="titleSmall" style={{ color: "white" }}>
-                Call of Duty: Black Ops
-              </Text>
-              <Text variant="bodySmall" style={{ color: "white" }}>
-                Call of Duty: Black Ops
-              </Text>
-            </ImageBackground>
+            ></ImageBackground>
           </View>
         </ScrollView>
       </View>
-
       <FAB.Group
         open={open}
         label={open ? "" : "Add"}
@@ -125,20 +111,21 @@ const Home = ({ route }) => {
           {
             icon: "animation-play",
             label: "Add to Queue",
-            color: colors.secondaryAccent,
-            labelTextColor: colors.primary,
+            color: theme.colors.text,
+            labelTextColor: theme.colors.text,
             style: {
-              backgroundColor: colors.primary,
+              backgroundColor: theme.colors.primary,
             },
             onPress: () => console.log("Pressed queue"),
           },
           {
             icon: "gamepad-variant",
             label: "Add New Game",
-            color: colors.secondaryAccent,
-            labelTextColor: colors.primary,
+            color: theme.colors.text,
+            labelTextColor: theme.colors.text,
             style: {
-              backgroundColor: colors.primary,
+              alignItems: "center",
+              backgroundColor: theme.colors.primary,
             },
             onPress: () => {
               navigation.navigate("AddGame");
@@ -147,18 +134,19 @@ const Home = ({ route }) => {
           {
             icon: "playlist-play",
             label: "Create Playlist",
-            color: colors.secondaryAccent,
-            labelTextColor: colors.primary,
+            color: theme.colors.text,
+            labelTextColor: theme.colors.text,
             style: {
-              backgroundColor: colors.primary,
+              backgroundColor: theme.colors.primary,
             },
             onPress: () => console.log("Pressed playlist"),
           },
         ]}
         onStateChange={onStateChange}
-        fabStyle={{ backgroundColor: colors.primary }}
-        color={colors.secondaryAccent}
-        backdropColor={colors.background}
+        fabStyle={{ backgroundColor: theme.colors.primary }}
+        color={theme.colors.text}
+        backdropColor={theme.colors.transpBackground}
+        style={{ elevation: 100 }}
       />
     </View>
   );

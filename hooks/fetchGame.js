@@ -47,28 +47,31 @@ const useGame = () => {
     if (gamesData) {
       const gamesWithDevAndPlatform = await Promise.all(
         gamesData.map(async (game) => {
-          const developerId =
-            game.involved_companies?.map(
-              (involvedCompany) => involvedCompany.id
-            ) || "N/A";
-          const companyId =
-            game.involved_companies?.map(
-              (involvedCompany) => involvedCompany.company
-            ) || "N/A";
-          const platformIds = game.platforms;
+          // const developerId =
+          //   game.involved_companies?.map(
+          //     (involvedCompany) => involvedCompany.id
+          //   ) || "N/A";
+          // const companyId =
+          //   game.involved_companies?.map(
+          //     (involvedCompany) => involvedCompany.company
+          //   ) || "N/A";
+          // const platformIds = game.platforms;
 
-          await Promise.all(developerId.map((id) => getDeveloper(id, token)));
+          // await Promise.all(developerId.map((id) => getDeveloper(id, token)));
 
-          const companyData = await Promise.all(
-            companyId.map((id) => getCompany(id, token))
-          );
+          // const companyData = await Promise.all(
+          //   companyId.map((id) => getCompany(id, token))
+          // );
 
-          const platformData = await Promise.all(
-            platformIds.map((id) => getPlatform(id, token))
-          );
+          // const platformData = await Promise.all(
+          //   platformIds.map((id) => getPlatform(id, token))
+          // );
 
           const releaseDate =
-            game.release_dates?.map((date) => convertDate(date.date)) || "N/A";
+            game.release_dates
+              ?.map((date) => new Date(date.date))
+              .sort((a, b) => a - b)
+              .map((date) => convertDate(date)) || "N/A";
 
           const genres =
             game.genres && game.genres.length > 0
@@ -78,8 +81,8 @@ const useGame = () => {
           return {
             id: game.id,
             name: game.name,
-            developer: companyData.map((data) => data[0]),
-            platforms: platformData.map((data) => data[0]),
+            // developer: companyData.map((data) => data[0]),
+            // platforms: platformData.map((data) => data[0]),
             genres: genres,
             release_date: releaseDate,
             category: getCategory(game.category),
@@ -88,7 +91,7 @@ const useGame = () => {
             images: {
               cover: game.cover?.url
                 ? `https:${game.cover.url.replace("t_thumb", "t_cover_big")}`
-                : "", // Safe URL formatting
+                : undefined, // Safe URL formatting
               screenshots: game.screenshots,
             },
           };

@@ -14,10 +14,15 @@ import TabMenu from "./TabComponent";
 import CustomDrawer from "./customDrawer";
 
 const Drawer = createDrawerNavigator();
-import { useTheme } from "@react-navigation/native";
+
+import { useTheme } from "../context/themeContext";
+import { createStyles } from "../Styles";
 
 function DrawerMenu() {
-  const colors = useTheme().colors;
+  // theme
+  const { theme } = useTheme();
+  const styles = createStyles(theme);
+
   const { user } = useAuthContext();
   return (
     <Drawer.Navigator
@@ -33,9 +38,14 @@ function DrawerMenu() {
             <MaterialCommunityIcons
               name={focused ? "home" : "home-outline"}
               size={size}
-              color={colors.primary}
+              color={theme.colors.primary}
             />
           ),
+          drawerLabelStyle: {
+            marginLeft: -20,
+            color: theme.colors.text
+          },
+          drawerActiveTintColor: theme.colors.primary,
           headerShown: false,
         }}
       />
@@ -47,9 +57,14 @@ function DrawerMenu() {
             <MaterialCommunityIcons
               name={focused ? "gamepad-variant" : "gamepad-variant-outline"}
               size={size}
-              color={colors.primary}
+              color={theme.colors.primary}
             />
           ),
+          drawerLabelStyle: {
+            marginLeft: -20,
+            color: theme.colors.text
+          },
+          drawerActiveTintColor: theme.colors.primary,
           headerShown: false,
         }}
       />
@@ -61,10 +76,15 @@ function DrawerMenu() {
             <MaterialCommunityIcons
               name={focused ? "chart-line" : "chart-line"}
               size={size}
-              color={colors.primary}
+              color={theme.colors.primary}
             />
           ),
-          headerTintColor: colors.text,
+          drawerLabelStyle: {
+            marginLeft: -20,
+            color: theme.colors.text
+          },
+          drawerActiveTintColor: theme.colors.primary,
+          headerTintColor: theme.colors.text,
         }}
       />
       <Drawer.Screen
@@ -75,9 +95,14 @@ function DrawerMenu() {
             <MaterialCommunityIcons
               name={focused ? "cog" : "cog-outline"}
               size={size}
-              color={colors.primary}
+              color={theme.colors.primary}
             />
           ),
+          drawerLabelStyle: {
+            marginLeft: -20,
+            color: theme.colors.text
+          },
+          drawerActiveTintColor: theme.colors.primary,
           headerShown: false,
         }}
       />

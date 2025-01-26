@@ -4,12 +4,12 @@ import {
   ScrollView,
   SafeAreaView,
   Pressable,
-  StatusBar,
   Text,
   KeyboardAvoidingView,
   Platform,
   TouchableOpacity,
   StyleSheet,
+  RefreshControl,
 } from "react-native";
 import {
   ActivityIndicator,
@@ -22,10 +22,14 @@ import * as EXPO from "expo-status-bar";
 import Modal from "react-native-modal";
 
 import SearchCard from "../components/SearchCard";
-import GameModal from "../components/Modal";
+import GameModal from "../components/GameModal";
 import useGame from "../hooks/fetchGame";
-import { useNavigation, useTheme } from "@react-navigation/native";
+import { useNavigation } from "@react-navigation/native";
 import BacklogCard from "../components/BacklogCard";
+
+import { useTheme } from "../context/themeContext";
+import { createStyles } from "../Styles";
+import Loading from "../components/Loading";
 
 // Define your custom sorting logic
 const sortGames = (games, option) => {
@@ -33,7 +37,9 @@ const sortGames = (games, option) => {
     case "name":
       return games.sort((a, b) => a.name.localeCompare(b.name)); // Sort by name alphabetically
     case "release_date":
-      return games.sort((a, b) => a.release_date[0] - b.release_date[0]); // Sort by release date
+      return games.sort(
+        (a, b) => a.release_date.date[0] - b.release_date.date[0]
+      ); // Sort by release date
     case "rating":
       return games.sort((a, b) => b.rating - a.rating); // Sort by rating (highest first)
     default:
@@ -45,7 +51,10 @@ const sortGames = (games, option) => {
 const AddGame = ({ route }) => {
   const auth = route.params;
   const navigation = useNavigation();
-  const colors = useTheme().colors;
+
+  // theme
+  const { theme } = useTheme();
+  const styles = createStyles(theme);
 
   const [isModalVisible, setModalVisible] = React.useState(false);
   const [modalData, setmodalData] = React.useState([]);
@@ -69,7 +78,7 @@ const AddGame = ({ route }) => {
     }
   };
 
-  const { games, isLoading, error, fetchGameData } = useGame();
+  const { isLoading, fetchGameData } = useGame();
 
   const toggleModal = () => {
     setModalVisible(!isModalVisible);
@@ -79,7 +88,7 @@ const AddGame = ({ route }) => {
     const body =
       `fields cover.url, name, release_dates.date, genres.name, category, involved_companies.*, screenshots.url, platforms, status, summary, rating; search "` +
       text +
-      `'%"; where version_parent = null & category = (0,1,3,6,8);limit 10;`;
+      `'%"; where version_parent = null & category = (0,1,6,8);limit 10;`;
 
     fetchGameData(auth, body).then((data) => {
       const sortedData = sortGames(data, sort); // Apply sorting after data is fetched
@@ -92,16 +101,11 @@ const AddGame = ({ route }) => {
     return () => clearTimeout(timeoutId);
   }, [text, sort]);
 
-  console.log(
-    `Query '${text}': `,
-    query.map((g) => g.name)
-  );
-
   // Return the JSX for the AddGame component
   return (
-    <View>
-      <EXPO.StatusBar style="auto" />
-      <Modal
+    <View style={styles.container}>
+      <EXPO.StatusBar style={theme.theme === "dark" ? "light" : "dark"} />
+      {/* <Modal
         isVisible={isModalVisible}
         onBackdropPress={() => setModalVisible(false)}
         swipeDirection="down"
@@ -116,41 +120,23 @@ const AddGame = ({ route }) => {
         style={{ justifyContent: "flex-end", margin: 0 }}
       >
         <GameModal game={modalData} auth={auth} />
-      </Modal>
-      <View
-        style={{
-          paddingTop: StatusBar.currentHeight,
-          padding: 5,
-          borderBottomEndRadius: 15,
-          borderBottomStartRadius: 15,
-          backgroundColor: colors.secondary,
-          elevation: 5,
-
-          width: "100%",
-          minHeight: 150,
-        }}
-      >
+      </Modal> */}
+      <View style={styles.appHeader}>
         <View
           style={{
             flexDirection: "row",
             alignItems: "center",
-            alignContent: "stretch",
+            alignContent: "space-between",
           }}
         >
           <IconButton
             icon="arrow-left"
-            iconColor={colors.text}
+            size={24}
+            iconColor={theme.colors.text}
             onPress={() => navigation.goBack()}
           />
-          <View style={{ flexGrow: 2, height: 40 }}>
-            <Text
-              style={{
-                fontSize: 24,
-                alignSelf: "center",
-              }}
-            >
-              Add Game
-            </Text>
+          <View style={{ flexGrow: 2, height: 40, justifyContent: "center" }}>
+            <Text style={styles.headerText}>Add Game</Text>
           </View>
           <View style={{ width: 40 }}></View>
         </View>
@@ -170,15 +156,14 @@ const AddGame = ({ route }) => {
             value={text}
             onChangeText={(t) => {
               setText(t);
-              // handleSearch();
             }}
-            selectionColor={colors.text}
-            cursorColor={colors.text}
-            activeOutlineColor={colors.text}
-            textColor={colors.text}
+            selectionColor={theme.colors.text}
+            cursorColor={theme.colors.text}
+            activeOutlineColor={theme.colors.text}
+            textColor={theme.colors.text}
             left={<TextInput.Icon icon={"magnify"} />}
             style={{
-              backgroundColor: colors.secondary,
+              backgroundColor: theme.colors.surface,
               margin: 5,
               flexGrow: 2,
             }}
@@ -199,23 +184,23 @@ const AddGame = ({ route }) => {
               {
                 icon: "alpha-a-circle-outline",
                 value: "name",
-                label: "Name",
-                checkedColor: colors.primary,
-                style: { backgroundColor: colors.secondary },
+                checkedColor: theme.colors.primary,
+                uncheckedColor: theme.colors.text,
+                style: { backgroundColor: theme.colors.surface },
               },
               {
                 icon: "calendar-clock-outline",
                 value: "release_date",
-                label: "Release Date",
-                checkedColor: colors.primary,
-                style: { backgroundColor: colors.secondary },
+                checkedColor: theme.colors.primary,
+                uncheckedColor: theme.colors.text,
+                style: { backgroundColor: theme.colors.surface },
               },
               {
                 icon: "percent",
                 value: "rating",
-                label: "Rating",
-                checkedColor: colors.primary,
-                style: { backgroundColor: colors.secondary },
+                checkedColor: theme.colors.primary,
+                uncheckedColor: theme.colors.text,
+                style: { backgroundColor: theme.colors.surface },
               },
             ]}
             style={{
@@ -224,26 +209,7 @@ const AddGame = ({ route }) => {
             }}
           />
           {isLoading ? (
-            <View
-              style={{
-                width: "50%",
-                flexDirection: "row",
-                alignItems: "center",
-                justifyContent: "center",
-                alignSelf: "center",
-                padding: 10,
-                marginHorizontal: 15,
-                marginVertical: 10,
-                backgroundColor: colors.secondary,
-                borderRadius: 25,
-                elevation: 5,
-              }}
-            >
-              <ActivityIndicator color={colors.primary} />
-              <Text style={{ color: colors.text, marginLeft: 10 }}>
-                GLaDOS is looking ...
-              </Text>
-            </View>
+            <Loading />
           ) : (
             <KeyboardAvoidingView
               behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -257,6 +223,12 @@ const AddGame = ({ route }) => {
                 ref={scrollViewRef}
                 onScroll={handleScroll} // Handle scroll event
                 scrollEventThrottle={16} // Smooth scrolling updates
+                refreshControl={
+                  <RefreshControl
+                    refreshing={isLoading}
+                    onRefresh={handleSearch}
+                  />
+                }
                 onContentSizeChange={(width, height) => {
                   console.log("Content size:", width, height);
                 }}
@@ -271,20 +243,19 @@ const AddGame = ({ route }) => {
                         // toggleModal();
                       }}
                     >
-                      {/* <SearchCard key={g.id} game={g} /> */}
-                      <BacklogCard key={g.id} game={g} />
+                      <SearchCard key={g.id} game={g} />
                     </Pressable>
                   ))}
                 </View>
               </ScrollView>
-              {showButton && (
+              {/* {showButton && (
                 <TouchableOpacity
                   style={styles.floatingButton}
                   onPress={scrollToTop}
                 >
                   <Text style={styles.buttonText}>↑</Text>
                 </TouchableOpacity>
-              )}
+              )} */}
             </KeyboardAvoidingView>
           )}
         </SafeAreaView>

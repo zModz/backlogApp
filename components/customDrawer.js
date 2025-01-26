@@ -13,12 +13,15 @@ import { useAuthContext } from "../hooks/useAuthContext";
 import { useLogout } from "../hooks/useLogout";
 
 import Constants from "expo-constants";
-import { useTheme } from "@react-navigation/native";
+import { useTheme } from "../context/themeContext";
+import { createStyles } from "../Styles";
 
 const CustomDrawer = ({ drops, user }) => {
   // const { user } = useAuthContext();
 
-  const colors = useTheme().colors;
+  // theme
+  const { theme } = useTheme();
+  const styles = createStyles(theme);
 
   const username = user ? user.username : ""; // Check if user exists before accessing its properties
   const { logout } = useLogout();
@@ -28,7 +31,7 @@ const CustomDrawer = ({ drops, user }) => {
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: colors.background }}>
+    <View style={{ flex: 1, backgroundColor: theme.colors.surface }}>
       <DrawerContentScrollView>
         <View style={{ padding: 20 }}>
           <Avatar.Text
@@ -36,17 +39,17 @@ const CustomDrawer = ({ drops, user }) => {
             label={username[0]}
             style={{
               marginBottom: 10,
-              backgroundColor: colors.accent,
+              backgroundColor: theme.colors.accent,
             }}
-            color={colors.secondaryAccent}
+            color={theme.colors.secondaryAccent}
           />
           <Text
             variant="titleLarge"
-            style={{ color: colors.text, fontWeight: "bold" }}
+            style={{ color: theme.colors.text, fontWeight: "bold" }}
           >
             DISPLAY NAME
           </Text>
-          <Text variant="bodyMedium" style={{ color: colors.text }}>
+          <Text variant="bodyMedium" style={{ color: theme.colors.text }}>
             @{username}
           </Text>
         </View>
@@ -58,13 +61,17 @@ const CustomDrawer = ({ drops, user }) => {
           mode="outlined"
           icon={"logout"}
           onPress={() => handleLogout()}
-          style={{ marginBottom: 10, borderColor: colors.primary }}
-          textColor={colors.primary}
+          style={{ marginBottom: 10, borderColor: theme.colors.primary }}
+          textColor={theme.colors.primary}
         >
           Logout
         </Button>
         <Text
-          style={{ alignSelf: "center", marginBottom: 10, color: colors.text }}
+          style={{
+            alignSelf: "center",
+            marginBottom: 10,
+            color: theme.colors.text,
+          }}
         >
           Made with ❤️ from Portugal 🇵🇹
         </Text>
