@@ -18,11 +18,12 @@
     "@react-navigation/stack": "^6.3.20",
     "axios": "^1.6.7",
     "env-cmd": "^10.1.0",
-    "expo": "^52.0.25",
+    "expo": "~52.0.26",
     "expo-constants": "~17.0.3",
-    "expo-status-bar": "~2.0.0",
+    "expo-dev-client": "~5.0.10",
+    "expo-status-bar": "~2.0.1",
+    "expo-updates": "~0.26.13",
     "express": "^4.18.3",
-    "firebase": "^10.8.0",
     "mongoose": "^8.2.0",
     "react": "18.3.1",
     "react-native": "^0.76.6",
@@ -30,16 +31,27 @@
     "react-native-modal": "^13.0.1",
     "react-native-paper": "^5.13.1",
     "react-native-reanimated": "~3.16.1",
-    "react-native-safe-area-context": "^4.12.0",
+    "react-native-safe-area-context": "4.12.0",
     "react-native-screens": "~4.4.0",
     "react-native-swipe-gestures": "^1.0.5",
-    "react-native-vector-icons": "^10.0.3",
-    "expo-dev-client": "~5.0.10",
-    "expo-updates": "~0.26.13"
+    "react-native-vector-icons": "^10.0.3"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
     "react-native-dotenv": "^3.4.10"
   },
-  "private": true
+  "private": true,
+  "expo": {
+    "doctor": {
+      "reactNativeDirectoryCheck": {
+        "exclude": [
+          "react-native-modal",
+          "env-cmd",
+          "express",
+          "mongoose",
+          "react-native-swipe-gestures"
+        ]
+      }
+    }
+  }
 }
