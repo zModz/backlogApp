@@ -23,18 +23,20 @@ const SearchCard = ({ game }) => {
 
   return (
     <BaseCard>
-      <IconButton
-        icon={"plus"}
-        iconColor={theme.colors.text}
-        size={21}
-        style={{
-          backgroundColor: theme.colors.primary,
-          position: "absolute",
-          right: 2,
-          top: 2,
-        }}
-        onPress={() => {}}
-      />
+      {game.id != null && (
+        <IconButton
+          icon={"plus"}
+          iconColor={theme.colors.text}
+          size={21}
+          style={{
+            backgroundColor: theme.colors.primary,
+            position: "absolute",
+            right: 2,
+            top: 2,
+          }}
+          onPress={() => {}}
+        />
+      )}
       <View style={{ flexDirection: "row" }}>
         <Image
           source={{
@@ -62,7 +64,13 @@ const SearchCard = ({ game }) => {
           </Text>
           <Text
             variant="titleLarge"
-            style={{ width: 180, fontWeight: "bold", color: theme.colors.text }}
+            style={{
+              width: 130,
+              maxHeight: 55,
+              fontWeight: "bold",
+              color: theme.colors.text,
+              overflow: "visible",
+            }}
           >
             {game.name != null ? game.name : "UNKNOWN"}
           </Text>

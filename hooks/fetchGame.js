@@ -44,7 +44,7 @@ const useGame = () => {
     setIsLoading(true);
     const gamesData = await fetchData(API_URL, "games", body, token);
 
-    if (gamesData) {
+    if (gamesData && gamesData.length > 0) {
       const gamesWithDevAndPlatform = await Promise.all(
         gamesData.map(async (game) => {
           // const developerId =
@@ -100,6 +100,20 @@ const useGame = () => {
 
       setIsLoading(false);
       return gamesWithDevAndPlatform;
+    } else {
+      setIsLoading(false);
+      return [
+        {
+          id: null,
+          name: "No results found",
+          genres: "N/A",
+          release_date: undefined,
+          category: "N/A",
+          summary: "No games available.",
+          rating: "N/A",
+          images: undefined,
+        },
+      ];
     }
   };
 

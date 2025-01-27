@@ -1,8 +1,9 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { View, Text, StatusBar, ScrollView } from "react-native";
 
 import { useNavigation } from "@react-navigation/native";
 import {
+  ActivityIndicator,
   Icon,
   IconButton,
   Switch,
@@ -10,6 +11,7 @@ import {
   Tooltip,
 } from "react-native-paper";
 import * as EXPO from "expo-status-bar";
+import * as Updates from "expo-updates";
 
 import { useTheme } from "../context/themeContext";
 import { createStyles } from "../Styles";
@@ -20,10 +22,20 @@ const Settings = () => {
   const styles = createStyles(theme);
   // console.log(theme);
 
-  const navigation = useNavigation();
+  const { currentlyRunning, isUpdateAvailable, isUpdatePending, isChecking } =
+    Updates.useUpdates();
 
-  const [isSwitchOn, setIsSwitchOn] = React.useState(false);
-  const onToggleSwitch = () => setIsSwitchOn(!isSwitchOn);
+  useEffect(() => {
+    if (isUpdatePending) {
+      // Update has successfully downloaded; apply it now
+      Updates.reloadAsync();
+    }
+  }, [isUpdatePending]);
+
+  // If true, we show the button to download and run the update
+  const showDownloadButton = isUpdateAvailable;
+
+  const navigation = useNavigation();
 
   return (
     <View style={styles.container}>
@@ -77,6 +89,50 @@ const Settings = () => {
             animated="true"
             style={{ borderWidth: 0 }}
           />
+        </View>
+        <View
+          style={{
+            flexDirection: "row",
+            justifyContent: "space-between",
+            alignItems: "center",
+            marginVertical: 10,
+            minWidth: "100%",
+            minHeight: 50,
+          }}
+        >
+          <View
+            style={{
+              flexDirection: "column",
+            }}
+          >
+            <Text style={{ color: theme.colors.text }}>Check For Updates</Text>
+            {!isUpdatePending && <Text>No Updates Available</Text>}
+          </View>
+          {showDownloadButton ? (
+            <IconButton
+              mode="outlined"
+              selected={isUpdatePending}
+              icon={"cloud-arrow-down"}
+              containerColor={"#131862"}
+              iconColor={"white"}
+              size={20}
+              onPress={() => Updates.fetchUpdateAsync()}
+              animated="true"
+              style={{ borderWidth: 0 }}
+            />
+          ) : (
+            <IconButton
+              mode="outlined"
+              selected={isChecking}
+              icon={isChecking ? "reload" : "check-all"}
+              containerColor={"green"}
+              iconColor={"white"}
+              size={20}
+              onPress={() => Updates.checkForUpdateAsync()}
+              animated="true"
+              style={{ borderWidth: 0 }}
+            />
+          )}
         </View>
       </ScrollView>
     </View>

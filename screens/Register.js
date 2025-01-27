@@ -16,7 +16,8 @@ import { StatusBar } from "expo-status-bar";
 import { Button, Divider, TextInput } from "react-native-paper";
 import { useRegister } from "../hooks/useRegister";
 
-import { useTheme } from "@react-navigation/native";
+import { useTheme } from "../context/themeContext";
+import { createStyles } from "../Styles";
 
 const Register = ({ navigation }) => {
   const [username, setUsername] = useState("");
@@ -36,7 +37,9 @@ const Register = ({ navigation }) => {
     }
   };
 
-  const colors = useTheme().colors;
+  // theme
+  const { theme } = useTheme();
+  const styles = createStyles(theme);
 
   return (
     <View
@@ -44,7 +47,7 @@ const Register = ({ navigation }) => {
         flex: 1,
         alignItems: "center",
         justifyContent: "center",
-        backgroundColor: colors.background,
+        backgroundColor: theme.colors.background,
       }}
     >
       <StatusBar style="auto" />
@@ -55,7 +58,7 @@ const Register = ({ navigation }) => {
             elevation: 5,
             minWidth: 320,
             maxHeight: 460,
-            backgroundColor: colors.secondary,
+            backgroundColor: theme.colors.surface,
             borderRadius: 15,
             padding: 5,
             justifyContent: "center",
@@ -91,28 +94,43 @@ const Register = ({ navigation }) => {
             label="Username"
             onChangeText={(text) => setUsername(text)}
             value={username}
-            activeOutlineColor={colors.text}
+            textColor={theme.colors.text}
+            activeOutlineColor={theme.colors.text}
             error={error}
-            style={{ margin: 5 }}
+            style={{
+              backgroundColor: theme.colors.surface,
+              margin: 5,
+              flexGrow: 2,
+            }}
           />
           <TextInput
             mode="outlined"
             label="Email"
             onChangeText={(text) => setEmail(text)}
             value={email}
-            activeOutlineColor={colors.text}
+            textColor={theme.colors.text}
+            activeOutlineColor={theme.colors.text}
             error={error}
-            style={{ margin: 5 }}
+            style={{
+              backgroundColor: theme.colors.surface,
+              margin: 5,
+              flexGrow: 2,
+            }}
           />
           <TextInput
             mode="outlined"
             label="Password"
             onChangeText={(text) => setPassword(text)}
             value={password}
-            activeOutlineColor={colors.text}
+            textColor={theme.colors.text}
+            activeOutlineColor={theme.colors.text}
             error={error}
             secureTextEntry={!showPassword}
-            style={{ margin: 5 }}
+            style={{
+              backgroundColor: theme.colors.surface,
+              margin: 5,
+              flexGrow: 2,
+            }}
             right={
               <TextInput.Icon
                 icon={showPassword ? "eye-off" : "eye"}
@@ -125,10 +143,15 @@ const Register = ({ navigation }) => {
             label="Confirm Password"
             onChangeText={(text) => setCPassword(text)}
             value={cPassword}
-            activeOutlineColor={colors.text}
+            textColor={theme.colors.text}
+            activeOutlineColor={theme.colors.text}
             error={error}
             secureTextEntry={!showPassword}
-            style={{ margin: 5 }}
+            style={{
+              backgroundColor: theme.colors.surface,
+              margin: 5,
+              flexGrow: 2,
+            }}
             right={
               <TextInput.Icon
                 icon={showPassword ? "eye-off" : "eye"}
@@ -141,8 +164,8 @@ const Register = ({ navigation }) => {
             icon="account-plus"
             loading={loading}
             disabled={loading}
-            buttonColor={colors.primary}
-            textColor={colors.secondaryAccent}
+            buttonColor={theme.colors.primary}
+            textColor={theme.colors.text}
             onPress={() => handleRegister()}
             style={{ margin: 5 }}
           >
@@ -151,8 +174,8 @@ const Register = ({ navigation }) => {
           <Button
             mode="outlined"
             icon={"login"}
-            textColor={colors.primary}
-            style={{ margin: 5, borderColor: colors.primary }}
+            textColor={theme.colors.primary}
+            style={{ margin: 5, borderColor: theme.colors.primary }}
             onPress={() => navigation.navigate("Login")}
           >
             Already a user

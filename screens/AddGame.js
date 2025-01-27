@@ -10,9 +10,11 @@ import {
   TouchableOpacity,
   StyleSheet,
   RefreshControl,
+  Touchable,
 } from "react-native";
 import {
   ActivityIndicator,
+  Button,
   IconButton,
   SegmentedButtons,
   TextInput,
@@ -64,20 +66,6 @@ const AddGame = ({ route }) => {
   const [query, setQuery] = useState([]);
   const [sort, setSort] = useState("name");
 
-  const scrollViewRef = useRef(null); // Reference for the ScrollView
-  const [showButton, setShowButton] = useState(false); // Control visibility of the button
-
-  const handleScroll = (event) => {
-    const offsetY = event.nativeEvent.contentOffset.y;
-    setShowButton(offsetY > 10); // Show button when scrolled down by 50px
-  };
-
-  const scrollToTop = () => {
-    if (scrollViewRef.current) {
-      scrollViewRef.current.scrollTo({ y: 0, animated: true });
-    }
-  };
-
   const { isLoading, fetchGameData } = useGame();
 
   const toggleModal = () => {
@@ -85,15 +73,17 @@ const AddGame = ({ route }) => {
   };
 
   const handleSearch = () => {
-    const body =
-      `fields cover.url, name, release_dates.date, genres.name, category, involved_companies.*, screenshots.url, platforms, status, summary, rating; search "` +
-      text +
-      `'%"; where version_parent = null & category = (0,1,6,8);limit 10;`;
-
-    fetchGameData(auth, body).then((data) => {
-      const sortedData = sortGames(data, sort); // Apply sorting after data is fetched
-      setQuery(sortedData); // Update state with the sorted data
-    });
+    if (text != "") {
+      const body =
+        `fields cover.url, name, release_dates.date, genres.name, category, involved_companies.*, screenshots.url, platforms, status, summary, rating; search "` +
+        text +
+        `'%"; where version_parent = null & category = (0,1,6,8);limit 10;`;
+  
+      fetchGameData(auth, body).then((data) => {
+        const sortedData = sortGames(data, sort); // Apply sorting after data is fetched
+        setQuery(sortedData); // Update state with the sorted data
+      });
+    }
   };
 
   useEffect(() => {
@@ -105,7 +95,7 @@ const AddGame = ({ route }) => {
   return (
     <View style={styles.container}>
       <EXPO.StatusBar style={theme.theme === "dark" ? "light" : "dark"} />
-      {/* <Modal
+      <Modal
         isVisible={isModalVisible}
         onBackdropPress={() => setModalVisible(false)}
         swipeDirection="down"
@@ -120,7 +110,7 @@ const AddGame = ({ route }) => {
         style={{ justifyContent: "flex-end", margin: 0 }}
       >
         <GameModal game={modalData} auth={auth} />
-      </Modal> */}
+      </Modal>
       <View style={styles.appHeader}>
         <View
           style={{
@@ -212,16 +202,13 @@ const AddGame = ({ route }) => {
             <Loading />
           ) : (
             <KeyboardAvoidingView
-              behavior={Platform.OS === "ios" ? "padding" : "height"}
+              behavior={Platform.OS === "ios" ? "padding" : "none"}
             >
               <ScrollView
                 contentContainerStyle={{
                   paddingHorizontal: 15,
-                  // paddingTop: 5,
-                  // paddingBottom: 5,
+                  paddingBottom: 330,
                 }}
-                ref={scrollViewRef}
-                onScroll={handleScroll} // Handle scroll event
                 scrollEventThrottle={16} // Smooth scrolling updates
                 refreshControl={
                   <RefreshControl
@@ -229,33 +216,26 @@ const AddGame = ({ route }) => {
                     onRefresh={handleSearch}
                   />
                 }
-                onContentSizeChange={(width, height) => {
-                  console.log("Content size:", width, height);
-                }}
               >
-                <View>
+                <View style={{ minHeight: 1 }}>
                   {/* Map through the games array and display each game */}
-                  {query?.map((g) => (
-                    <Pressable
-                      key={g.id}
-                      onPress={() => {
-                        setmodalData(g);
-                        // toggleModal();
-                      }}
-                    >
-                      <SearchCard key={g.id} game={g} />
-                    </Pressable>
-                  ))}
+                  {query?.length > 0 ? (
+                    query?.map((g) => (
+                      <Pressable
+                        key={g.id}
+                        onPress={() => {
+                          setmodalData(g);
+                          toggleModal();
+                        }}
+                      >
+                        <SearchCard key={g.id} game={g} />
+                      </Pressable>
+                    ))
+                  ) : (
+                    <></>
+                  )}
                 </View>
               </ScrollView>
-              {/* {showButton && (
-                <TouchableOpacity
-                  style={styles.floatingButton}
-                  onPress={scrollToTop}
-                >
-                  <Text style={styles.buttonText}>↑</Text>
-                </TouchableOpacity>
-              )} */}
             </KeyboardAvoidingView>
           )}
         </SafeAreaView>
@@ -263,29 +243,5 @@ const AddGame = ({ route }) => {
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  floatingButton: {
-    position: "absolute",
-    bottom: 0,
-    right: 0,
-    backgroundColor: "#007AFF",
-    borderRadius: 30,
-    width: 60,
-    height: 60,
-    justifyContent: "center",
-    alignItems: "center",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 3,
-    elevation: 5,
-  },
-  buttonText: {
-    color: "white",
-    fontSize: 24,
-    fontWeight: "bold",
-  },
-});
 
 export default AddGame;

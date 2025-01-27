@@ -46,7 +46,7 @@ export const createStyles = (theme) =>
       alignItems: "center",
       justifyContent: "center",
       alignSelf: "center",
-      padding: 10, 
+      padding: 10,
       marginHorizontal: 15,
       marginVertical: 10,
       backgroundColor: theme.colors.surface,

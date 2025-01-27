@@ -80,8 +80,8 @@ const Home = ({ route }) => {
         <ScrollView horizontal={true}>
           <View
             style={{
-              height: 250,
-              width: 160,
+              width: 120,
+              height: 200,
               backgroundColor: "white",
               borderRadius: 25,
               margin: 15,

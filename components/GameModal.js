@@ -16,6 +16,7 @@ import axios from "axios";
 import AddToBacklog from "./AddToBacklog";
 import { useAuthContext } from "../hooks/useAuthContext";
 import { useBacklogContext } from "../hooks/useBacklogContext";
+import TextWithIcon from "./TextWithIcon";
 
 const GameModal = ({ game, auth }) => {
   const [dev, setDev] = useState("");
@@ -23,86 +24,40 @@ const GameModal = ({ game, auth }) => {
   const { user } = useAuthContext();
   const { dispatch } = useBacklogContext();
 
-  var genres;
-  if (game.genres != undefined) {
-    for (let i = 0; i < game.genres.length; i++) {
-      var element = [];
-      element.push(game.genres[i].name);
-      genres = element.join(", ");
-    }
-  } else {
-    genres = "UNKNOWN";
-  }
+  // const addBacklogClick = async () => {
+  //   if (!user) return;
 
-  var category;
-  const catEnum = (id) => {
-    switch (id) {
-      case 0:
-        category = "Game";
-        break;
-      case 1:
-        category = "DLC";
-        break;
-      case 3:
-        category = "Bundle";
-        break;
-      case 6:
-        category = "Episode";
-        break;
-      case 8:
-        category = "Remake";
-        break;
-      default:
-        category = "UNKNOWN";
-        break;
-    }
-  };
+  //   const res = await fetch(
+  //     process.env.EXPO_PUBLIC_SERVER_IP + "/api/backlog/" + user.backlogID,
+  //     {
+  //       method: "PATCH",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //         Authorization: `Bearer ${user.token}`,
+  //       },
+  //       body: JSON.stringify({
+  //         id: game.id,
+  //         name: game.name,
+  //         dev: dev[0].name,
+  //         genres: genres,
+  //         category: category,
+  //         release_date: date,
+  //         images: {
+  //           cover: "https:" + game.cover.url.replace("t_thumb", "t_cover_big"),
+  //           screenshots: game.screenshots,
+  //         },
+  //       }),
+  //     }
+  //   );
 
-  catEnum(game.category);
+  //   const json = await res.json();
+  //   console.log(json);
 
-  var date;
-  if (game.release_dates != undefined) {
-    let dateTime = game.release_dates[0].date;
-    const currentDate = new Date(dateTime * 1000);
-    date = currentDate.toLocaleDateString("pt-PT");
-  } else {
-    date = "UNKNOWN";
-  }
-
-  const addBacklogClick = async () => {
-    if (!user) return;
-
-    const res = await fetch(
-      process.env.EXPO_PUBLIC_SERVER_IP + "/api/backlog/" + user.backlogID,
-      {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${user.token}`,
-        },
-        body: JSON.stringify({
-          id: game.id,
-          name: game.name,
-          dev: dev[0].name,
-          genres: genres,
-          category: category,
-          release_date: date,
-          images: {
-            cover: "https:" + game.cover.url.replace("t_thumb", "t_cover_big"),
-            screenshots: game.screenshots,
-          },
-        }),
-      }
-    );
-
-    const json = await res.json();
-    console.log(json);
-
-    if (res.ok) {
-      dispatch({ type: "ADD_BACKLOG", payload: json });
-      Alert.alert("Game Added!", "Have fun gaming!");
-    }
-  };
+  //   if (res.ok) {
+  //     dispatch({ type: "ADD_BACKLOG", payload: json });
+  //     Alert.alert("Game Added!", "Have fun gaming!");
+  //   }
+  // };
 
   // console.log(dev[0])
 
@@ -119,9 +74,12 @@ const GameModal = ({ game, auth }) => {
         <ImageBackground
           source={{
             uri:
-              game.screenshots != undefined
+              game.images.screenshots != undefined
                 ? "https:" +
-                  game.screenshots[0].url.replace("t_thumb", "t_original")
+                  game.images.screenshots[0].url.replace(
+                    "t_thumb",
+                    "t_original"
+                  )
                 : "https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/No-Image-Placeholder.svg/624px-No-Image-Placeholder.svg.png",
           }}
           // height={200}
@@ -132,12 +90,11 @@ const GameModal = ({ game, auth }) => {
             borderTopRightRadius: 20,
             borderTopLeftRadius: 20,
           }}
-          blurRadius={5}
         >
           <View
             style={{
               flex: 1,
-              backgroundColor: "rgba(0,0,0,0.5)",
+              backgroundColor: "rgba(0,0,0,0.6)",
               borderTopRightRadius: 20,
               borderTopLeftRadius: 20,
             }}
@@ -168,9 +125,8 @@ const GameModal = ({ game, auth }) => {
             <Image
               source={{
                 uri:
-                  game.cover != undefined
-                    ? "https:" +
-                      game.cover.url.replace("t_thumb", "t_cover_big")
+                  game.images != undefined
+                    ? game.images.cover
                     : "https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/No-Image-Placeholder.svg/624px-No-Image-Placeholder.svg.png",
               }}
               width={150}
@@ -178,8 +134,6 @@ const GameModal = ({ game, auth }) => {
               style={{
                 borderRadius: 10,
                 margin: 5,
-                borderWidth: 2,
-                borderColor: "black",
               }}
             />
             <View
@@ -194,38 +148,32 @@ const GameModal = ({ game, auth }) => {
                 variant="bodyMedium"
                 style={{ fontStyle: "italic", color: "#9b9b9b" }}
               >
-                {category}
+                {game.category !== undefined ? game.category : ""}
               </Text>
               <Text
                 variant="headlineSmall"
                 style={{ width: 155, fontWeight: "bold", color: "white" }}
               >
-                {game.name != null ? game.name : "UNKNOWN"}
+                {game.name != null ? game.name : "N/A"}
               </Text>
-              <Text
+              {/* <Text
                 variant="titleMedium"
                 style={{ width: 215, color: "white" }}
               >
                 {game.involved_companies[0]
                   ? game.involved_companies[0].name
-                  : "UNKNOWN"}
-              </Text>
-              <Text variant="bodyLarge" style={{ width: 215, color: "white" }}>
-                {genres}
-              </Text>
-              <View style={{ flexDirection: "row", alignItems: "center" }}>
-                <Icon
-                  source={"calendar-clock-outline"}
-                  size={20}
-                  color="white"
-                />
-                <Text
-                  variant="bodyMedium"
-                  style={{ color: "white", marginLeft: 3 }}
-                >
-                  {date}
-                </Text>
-              </View>
+                  : "N/A"}
+              </Text> */}
+              <TextWithIcon icon={"puzzle"}>
+                {game.genres !== undefined ? game.genres : ""}
+              </TextWithIcon>
+              <TextWithIcon icon={"calendar-clock-outline"}>
+                {game.release_date == undefined
+                  ? "N/A"
+                  : game.release_date.length > 1
+                  ? game.release_date[0] + "*"
+                  : game.release_date[0]}
+              </TextWithIcon>
             </View>
           </View>
           <TouchableWithoutFeedback>
