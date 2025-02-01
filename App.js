@@ -2,13 +2,12 @@
 // React
 import "react-native-gesture-handler";
 import * as React from "react";
-import { useColorScheme } from "react-native";
+import { Image, View } from "react-native";
 
 // Custom Packages
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
-import { PaperProvider, Portal } from "react-native-paper";
-
+import { ActivityIndicator, PaperProvider, Portal } from "react-native-paper";
 
 // Custom Screens
 import AddGame from "./screens/AddGame";
@@ -22,7 +21,8 @@ import DrawerMenu from "./components/DrawerComponent";
 // Context
 import { AuthContextProvider } from "./context/authContext";
 import { BacklogCTXProvider } from "./context/backlogContext";
-import { ThemeProvider } from "./context/themeContext"
+import { ThemeProvider, useTheme } from "./context/themeContext";
+import { createStyles } from "./Styles";
 
 // Hooks
 import { useAuthContext } from "./hooks/useAuthContext";
@@ -32,14 +32,39 @@ import { useLogout } from "./hooks/useLogout";
 const Stack = createStackNavigator();
 
 const Main = React.memo(() => {
-  console.log("Main");
   const { user, loading, auth } = useAuthContext();
   const { logout } = useLogout();
+
+  // theme
+  const { theme } = useTheme();
+  const styles = createStyles(theme);
 
   // TODO: Verify is token is expired
   // console.log(user);
 
-  console.log("User: ", user);
+  if (loading) {
+    return (
+      <View
+        style={{
+          flex: 1,
+          justifyContent: "center",
+          alignItems: "center",
+          backgroundColor: theme.colors.background,
+        }}
+      >
+        <Image
+          source={require("./assets/ARMORY2_ico.png")}
+          style={{
+            height: 145,
+            width: 140,
+            margin: 25,
+            alignSelf: "center",
+          }}
+        />
+        <ActivityIndicator color={theme.colors.primary} />
+      </View>
+    );
+  }
 
   return (
     <PaperProvider>

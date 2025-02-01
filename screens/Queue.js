@@ -7,29 +7,25 @@ import {
   TextInput,
   Tooltip,
 } from "react-native-paper";
-import Styles from "../Styles";
-import { useNavigation, useTheme } from "@react-navigation/native";
+
+import { useNavigation } from "@react-navigation/native";
+
+import { useTheme } from "../context/themeContext";
+import { createStyles } from "../Styles";
 
 const Queue = () => {
   const [searchQuery, setSearchQuery] = React.useState("");
 
-  const colors = useTheme().colors;
+  // theme
+  const { theme } = useTheme();
+  const styles = createStyles(theme);
+
   const navigation = useNavigation();
 
   return (
-    <View>
+    <View style={styles.container}>
       <View
-        style={{
-          paddingTop: StatusBar.currentHeight,
-          padding: 5,
-          borderBottomEndRadius: 15,
-          borderBottomStartRadius: 15,
-          backgroundColor: colors.secondary,
-          elevation: 5,
-
-          minWidth: 360,
-          minHeight: 150,
-        }}
+        style={styles.appHeader}
       >
         <View
           style={{
@@ -41,15 +37,12 @@ const Queue = () => {
         >
           <IconButton
             icon="menu"
-            iconColor={colors.text}
+            iconColor={theme.colors.text}
             onPress={() => navigation.openDrawer()}
           />
           <View style={{ flexGrow: 2, height: 40 }}>
             <Text
-              style={{
-                fontSize: 24,
-                alignSelf: "center",
-              }}
+              style={styles.headerText}
             >
               Queue
             </Text>
@@ -57,7 +50,7 @@ const Queue = () => {
           <Tooltip title="Add new games">
             <IconButton
               icon="plus"
-              iconColor={colors.text}
+              iconColor={theme.colors.text}
               onPress={() => navigation.navigate("AddGame")}
             />
           </Tooltip>
@@ -75,20 +68,21 @@ const Queue = () => {
             label="Search"
             value={searchQuery}
             onChangeText={(t) => handleSearch(t)}
-            selectionColor={colors.text}
-            cursorColor={colors.text}
-            activeOutlineColor={colors.text}
-            textColor={colors.text}
+            selectionColor={theme.colors.text}
+            cursorColor={theme.colors.text}
+            activeOutlineColor={theme.colors.text}
+            textColor={theme.colors.text}
             left={<TextInput.Icon icon={"magnify"} />}
             style={{
-              backgroundColor: colors.secondary,
+              backgroundColor: theme.colors.surface,
+              margin: 5,
               flexGrow: 2,
             }}
           />
           <IconButton
             icon="filter-variant"
             size={24}
-            iconColor={colors.text}
+            iconColor={theme.colors.text}
             onPress={() => console.log("Pressed")}
           />
         </View>

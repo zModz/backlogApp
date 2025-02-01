@@ -6,7 +6,7 @@ import { useTheme } from "../context/themeContext";
 import { createStyles } from "../Styles";
 
 const TextWithIcon = ({ icon, children }) => {
-    // theme
+  // theme
   const { theme } = useTheme();
   const styles = createStyles(theme);
   return (
@@ -14,7 +14,7 @@ const TextWithIcon = ({ icon, children }) => {
       <Icon source={icon} color={theme.colors.text} size={14} />
       <Text
         variant="bodyMedium"
-        style={{ color: theme.colors.text, marginLeft: 5 }}
+        style={styles.cardText}
       >
         {children}
       </Text>

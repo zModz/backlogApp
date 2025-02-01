@@ -21,7 +21,7 @@ export const createStyles = (theme) =>
       minHeight: 100 * scale,
     },
     headerText: {
-      fontSize: 24 * scale,
+      fontSize: 24,
       alignSelf: "center",
       color: theme.colors.text,
     },
@@ -39,6 +39,21 @@ export const createStyles = (theme) =>
 
       minWidth: "90%",
       minHeight: 150,
+    },
+    cardTitle: {
+      fontSize: 22,
+      fontWeight: "bold",
+      width: 130 * scale,
+      maxHeight: 55,
+      color: theme.colors.text,
+    },
+    cardText: {
+      fontSize: 14,
+      width: 130 * scale,
+      maxHeight: 55,
+      marginLeft: 5,
+      color: theme.colors.text,
+      overflow: "visible",
     },
     loading: {
       width: "50%",

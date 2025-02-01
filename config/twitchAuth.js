@@ -10,7 +10,6 @@ export const getAuthTwitch = async () => {
         "&grant_type=client_credentials"
     );
     const data = await response.data;
-    console.log("Twitch Auth: ", data);
     return data;
   } catch (error) {
     console.log(error);

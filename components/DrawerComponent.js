@@ -24,6 +24,7 @@ function DrawerMenu() {
   const styles = createStyles(theme);
 
   const { user } = useAuthContext();
+
   return (
     <Drawer.Navigator
       drawerContent={(drops) => <CustomDrawer drops={drops} user={user} />}
@@ -43,7 +44,7 @@ function DrawerMenu() {
           ),
           drawerLabelStyle: {
             marginLeft: -20,
-            color: theme.colors.text
+            color: theme.colors.text,
           },
           drawerActiveTintColor: theme.colors.primary,
           headerShown: false,
@@ -62,7 +63,7 @@ function DrawerMenu() {
           ),
           drawerLabelStyle: {
             marginLeft: -20,
-            color: theme.colors.text
+            color: theme.colors.text,
           },
           drawerActiveTintColor: theme.colors.primary,
           headerShown: false,
@@ -81,10 +82,11 @@ function DrawerMenu() {
           ),
           drawerLabelStyle: {
             marginLeft: -20,
-            color: theme.colors.text
+            color: theme.colors.text,
           },
           drawerActiveTintColor: theme.colors.primary,
           headerTintColor: theme.colors.text,
+          headerShown: false,
         }}
       />
       <Drawer.Screen
@@ -100,7 +102,7 @@ function DrawerMenu() {
           ),
           drawerLabelStyle: {
             marginLeft: -20,
-            color: theme.colors.text
+            color: theme.colors.text,
           },
           drawerActiveTintColor: theme.colors.primary,
           headerShown: false,

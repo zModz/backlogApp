@@ -1,25 +1,33 @@
 import { View, Image } from "react-native";
 import {
-  Button,
-  Icon,
   IconButton,
-  Menu,
-  Modal,
-  Portal,
   Text,
 } from "react-native-paper";
 import React, { useState } from "react";
-import modal from "./GameModal";
+
 import BaseCard from "./BaseCard";
+import CheckBacklog from "../hooks/checkBacklog";
 
 import { useTheme } from "../context/themeContext";
 import { createStyles } from "../Styles";
 import TextWithIcon from "./TextWithIcon";
 
 const SearchCard = ({ game }) => {
+  const { user } = useAuthContext();
   // theme
   const { theme } = useTheme();
   const styles = createStyles(theme);
+
+  const checkIfGameInBacklog = async () => {
+    const isInBacklog = await CheckBacklog(user, game.id);
+    console.log(
+      isInBacklog
+        ? `Game ${game.name} is in backlog`
+        : `Game ${game.name} is not in backlog`
+    );
+  };
+
+  checkIfGameInBacklog();
 
   return (
     <BaseCard>

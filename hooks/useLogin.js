@@ -24,7 +24,8 @@ export const useLogin = () => {
         body: JSON.stringify({ email, password }),
       }
     ).catch((error) => {
-      Alert.alert("Network Error", error.message);
+      setLoading(false);
+      Alert.alert("Server Error", error.message);
     });
 
     const json = await res.json();

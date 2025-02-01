@@ -1,8 +1,8 @@
 import { createContext, useReducer, useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { jwtDecode } from "jwt-decode";
 
 import { getAuthTwitch } from "../config/twitchAuth";
-import { ActivityIndicator } from "react-native-paper";
 
 export const AuthContext = createContext();
 
@@ -25,6 +25,8 @@ export const AuthContextProvider = ({ children }) => {
   const [error, setError] = useState(false);
 
   useEffect(() => {
+    let logoutTimer;
+
     const initializeAuth = async () => {
       try {
         setLoading(true);
@@ -32,7 +34,29 @@ export const AuthContextProvider = ({ children }) => {
         // Fetch user from AsyncStorage
         const storedUser = await AsyncStorage.getItem("user");
         if (storedUser) {
-          dispatch({ type: "USER_LOGIN", payload: JSON.parse(storedUser) });
+          const userData = JSON.parse(storedUser);
+
+          // Decode token to check expiration
+          if (userData.token) {
+            const decodedToken = jwtDecode(userData.token);
+            const currentTime = Date.now() / 1000;
+
+            if (decodedToken.exp < currentTime) {
+              // Token expired, log the user out
+              dispatch({ type: "USER_LOGOUT" });
+              await AsyncStorage.removeItem("user");
+            } else {
+              // Set logout timer
+              const timeUntilExpiration =
+                (decodedToken.exp - currentTime) * 1000;
+              logoutTimer = setTimeout(
+                () => handleLogout(),
+                timeUntilExpiration
+              );
+
+              dispatch({ type: "USER_LOGIN", payload: userData });
+            }
+          }
         }
 
         // Fetch auth details from getAuthTwitch
@@ -46,16 +70,19 @@ export const AuthContextProvider = ({ children }) => {
     };
 
     initializeAuth();
+
+    return () => {
+      if (logoutTimer) clearTimeout(logoutTimer);
+    };
   }, []);
 
-  console.log("AuthContext state: ", state);
-
-  if (loading) {
-    return <ActivityIndicator size="large" />;
-  }
+  const handleLogout = async () => {
+    dispatch({ type: "USER_LOGOUT" });
+    await AsyncStorage.removeItem("user");
+  };
 
   return (
-    <AuthContext.Provider value={{ ...state, dispatch, auth }}>
+    <AuthContext.Provider value={{ ...state, dispatch, auth, loading }}>
       {children}
     </AuthContext.Provider>
   );

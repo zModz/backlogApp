@@ -1,6 +1,5 @@
 import "react-native-gesture-handler";
 import * as React from "react";
-import { View } from "react-native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 
@@ -9,14 +8,16 @@ import Queue from "../screens/Queue";
 import Playlists from "../screens/Playlists";
 import Backlog from "../screens/Backlog";
 
-// Hooks
-import { useAuthContext } from "../hooks/useAuthContext";
-import { useTheme } from "@react-navigation/native";
+import { useTheme } from "../context/themeContext";
+import { createStyles } from "../Styles";
 
 const Tab = createBottomTabNavigator();
 
 function TabMenu() {
-  const colors = useTheme().colors;
+  // theme
+  const { theme } = useTheme();
+  const styles = createStyles(theme);
+
   return (
     <Tab.Navigator
       shifting={true}
@@ -29,7 +30,7 @@ function TabMenu() {
           right: 16,
           left: 16,
           borderRadius: 15,
-          backgroundColor: colors.secondary,
+          backgroundColor: theme.colors.surface,
           borderTopWidth: 0,
           elevation: 5,
         },
@@ -41,10 +42,10 @@ function TabMenu() {
         component={Queue}
         options={{
           headerShown: false,
-          tabBarIcon: ({ color }) => (
+          tabBarIcon: ({ color, focused }) => (
             <MaterialCommunityIcons
               size={26}
-              color={color}
+              color={focused ? theme.colors.primary : color}
               name="animation-play"
             />
           ),
@@ -55,10 +56,10 @@ function TabMenu() {
         component={Backlog}
         options={{
           headerShown: false,
-          tabBarIcon: ({ color }) => (
+          tabBarIcon: ({ color, focused }) => (
             <MaterialCommunityIcons
               size={26}
-              color={color}
+              color={focused ? theme.colors.primary : color}
               name="gamepad-variant"
             />
           ),
@@ -69,10 +70,10 @@ function TabMenu() {
         component={Playlists}
         options={{
           headerShown: false,
-          tabBarIcon: ({ color }) => (
+          tabBarIcon: ({ color, focused }) => (
             <MaterialCommunityIcons
               size={26}
-              color={color}
+              color={focused ? theme.colors.primary : color}
               name="playlist-play"
             />
           ),

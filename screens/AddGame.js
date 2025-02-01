@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   ScrollView,
@@ -7,14 +7,9 @@ import {
   Text,
   KeyboardAvoidingView,
   Platform,
-  TouchableOpacity,
-  StyleSheet,
   RefreshControl,
-  Touchable,
 } from "react-native";
 import {
-  ActivityIndicator,
-  Button,
   IconButton,
   SegmentedButtons,
   TextInput,
@@ -27,7 +22,6 @@ import SearchCard from "../components/SearchCard";
 import GameModal from "../components/GameModal";
 import useGame from "../hooks/fetchGame";
 import { useNavigation } from "@react-navigation/native";
-import BacklogCard from "../components/BacklogCard";
 
 import { useTheme } from "../context/themeContext";
 import { createStyles } from "../Styles";
