@@ -31,7 +31,6 @@ const useGame = () => {
     const categories = {
       0: "Game",
       1: "DLC",
-      3: "Bundle",
       6: "Episode",
       8: "Remake",
     };

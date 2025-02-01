@@ -1,11 +1,22 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { View, ScrollView, ImageBackground, Pressable } from "react-native";
 import * as EXPO from "expo-status-bar";
-import { Avatar, FAB, IconButton, Text } from "react-native-paper";
+import {
+  ActivityIndicator,
+  Avatar,
+  FAB,
+  IconButton,
+  Text,
+} from "react-native-paper";
 import { useNavigation } from "@react-navigation/native";
 
 import { useTheme } from "../context/themeContext";
 import { createStyles } from "../Styles";
+
+import useGame from "../hooks/fetchGame";
+import { useAuthContext } from "../hooks/useAuthContext";
+import ImageGameCard from "../components/ImageGameCard";
+import Loading from "../components/Loading";
 
 const Home = ({ route }) => {
   const [state, setState] = React.useState({ open: false });
@@ -14,11 +25,25 @@ const Home = ({ route }) => {
 
   const navigation = useNavigation();
 
+  const [game, setGame] = useState([]);
+
   const { username } = route.params;
+  const { auth } = useAuthContext();
 
   // theme
   const { theme } = useTheme();
   const styles = createStyles(theme);
+
+  const { isLoading, fetchGameData } = useGame();
+
+  useEffect(() => {
+    fetchGameData(
+      auth,
+      `fields name,cover.url;where rating > 75 & category = 0 & platforms = {6,167,169};sort rating desc;limit 10;`
+    ).then((data) => {
+      setGame(data);
+    });
+  }, []);
 
   return (
     <View style={styles.container}>
@@ -72,35 +97,44 @@ const Home = ({ route }) => {
           </View>
         </View>
       </View>
-
       <View style={{ padding: 10 }}>
-        <Text variant="headlineLarge" style={{ color: theme.colors.text }}>
-          Discover
+        <Text
+          variant="headlineLarge"
+          style={{ color: theme.colors.text, marginBottom: 10 }}
+        >
+          Stats
         </Text>
-        <ScrollView horizontal={true}>
-          <View
-            style={{
-              width: 120,
-              height: 200,
-              backgroundColor: "white",
-              borderRadius: 25,
-              margin: 15,
-              elevation: 5,
-            }}
-          >
-            <ImageBackground
-              source={{
-                uri: "https://images.igdb.com/igdb/image/upload/t_cover_big/co1wkl.png",
-              }}
-              imageStyle={{ borderRadius: 25 }}
-              style={{
-                flex: 1,
-                justifyContent: "flex-end",
-                alignItems: "center",
-              }}
-            ></ImageBackground>
-          </View>
-        </ScrollView>
+        <View
+          style={{
+            height: 250,
+            backgroundColor: theme.colors.surface,
+            borderRadius: 15,
+
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <Text style={{ color: theme.colors.text }}>Coming Soon™</Text>
+        </View>
+      </View>
+      <View style={{ padding: 10 }}>
+        <View style={{ marginBottom: 10 }}>
+          <Text variant="headlineLarge" style={{ color: theme.colors.text }}>
+            Discover
+          </Text>
+          <Text variant="labelSmall" style={{ color: theme.colors.text }}>
+            Showing games with a rating of 75 or highter
+          </Text>
+        </View>
+        {isLoading ? (
+          <Loading />
+        ) : (
+          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+            <View style={{ minWidth: 1, flexDirection: "row" }}>
+              {game && game?.map((g) => <ImageGameCard key={g.id} game={g} />)}
+            </View>
+          </ScrollView>
+        )}
       </View>
       <FAB.Group
         open={open}

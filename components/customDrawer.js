@@ -47,7 +47,7 @@ const CustomDrawer = ({ drops, user }) => {
             variant="titleLarge"
             style={{ color: theme.colors.text, fontWeight: "bold" }}
           >
-            DISPLAY NAME
+            ARMORY USER
           </Text>
           <Text variant="bodyMedium" style={{ color: theme.colors.text }}>
             @{username}
