@@ -39,9 +39,6 @@ const Main = React.memo(() => {
   const { theme } = useTheme();
   const styles = createStyles(theme);
 
-  // TODO: Verify is token is expired
-  // console.log(user);
-
   if (loading) {
     return (
       <View

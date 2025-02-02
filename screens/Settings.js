@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { View, Text, StatusBar, ScrollView } from "react-native";
 
 import { useNavigation } from "@react-navigation/native";
@@ -17,25 +17,36 @@ import { useTheme } from "../context/themeContext";
 import { createStyles } from "../Styles";
 
 const Settings = () => {
+  const navigation = useNavigation();
   // theme
   const { theme, toggleTheme } = useTheme();
   const styles = createStyles(theme);
-  // console.log(theme);
 
-  const { currentlyRunning, isUpdateAvailable, isUpdatePending, isChecking } =
-    Updates.useUpdates();
+  const [isUpdating, setIsUpdating] = useState(false);
+  const [updateAvailable, setUpdateAvailable] = useState(false);
 
-  useEffect(() => {
-    if (isUpdatePending) {
-      // Update has successfully downloaded; apply it now
-      Updates.reloadAsync();
+  const checkForUpdates = async () => {
+    try {
+      const update = await Updates.checkForUpdateAsync();
+      if (update.isAvailable) {
+        setUpdateAvailable(true);
+      }
+    } catch (error) {
+      console.error("Error checking for updates:", error);
     }
-  }, [isUpdatePending]);
+  };
 
-  // If true, we show the button to download and run the update
-  const showDownloadButton = isUpdateAvailable;
+  const applyUpdate = async () => {
+    setIsUpdating(true);
+    try {
+      await Updates.fetchUpdateAsync();
+      await Updates.reloadAsync(); // Reloads the app with the new update
+    } catch (error) {
+      console.error("Error applying update:", error);
+      setIsUpdating(false);
+    }
+  };
 
-  const navigation = useNavigation();
 
   return (
     <View style={styles.container}>
@@ -106,29 +117,27 @@ const Settings = () => {
             }}
           >
             <Text style={{ color: theme.colors.text }}>Check For Updates</Text>
-            {!isUpdatePending && <Text>No Updates Available</Text>}
+            {!updateAvailable && <Text>No Updates Available</Text>}
           </View>
-          {showDownloadButton ? (
+          {updateAvailable ? (
             <IconButton
               mode="outlined"
-              selected={isUpdatePending}
-              icon={"cloud-arrow-down"}
+              icon={isUpdating ? "reload" : "cloud-arrow-down"}
               containerColor={"#131862"}
               iconColor={"white"}
               size={20}
-              onPress={() => Updates.fetchUpdateAsync()}
+              onPress={applyUpdate}
               animated="true"
               style={{ borderWidth: 0 }}
             />
           ) : (
             <IconButton
               mode="outlined"
-              selected={isChecking}
-              icon={isChecking ? "reload" : "check-all"}
+              icon={"check-all"}
               containerColor={"green"}
               iconColor={"white"}
               size={20}
-              onPress={() => Updates.checkForUpdateAsync()}
+              onPress={checkForUpdates}
               animated="true"
               style={{ borderWidth: 0 }}
             />

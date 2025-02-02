@@ -2,15 +2,15 @@ import { View, Image } from "react-native";
 import { ActivityIndicator, IconButton, Text } from "react-native-paper";
 import React, { useState } from "react";
 
-import BaseCard from "./BaseCard";
-import CheckBacklog from "../hooks/checkBacklog";
+import CheckBacklog from "../hooks/useCheckBacklog";
+import { useAuthContext } from "../hooks/useAuthContext";
+import useAddToBacklog from "../hooks/useAddToBacklog";
+import useGameDetails from "../hooks/useGameDetails";
 
+import BaseCard from "./BaseCard";
 import { useTheme } from "../context/themeContext";
 import { createStyles } from "../Styles";
 import TextWithIcon from "./TextWithIcon";
-import { useAuthContext } from "../hooks/useAuthContext";
-import useAddToBacklog from "../hooks/AddToBacklog";
-import useGameDetails from "../hooks/useGameDetails";
 
 const SearchCard = ({ game }) => {
   const { user, auth } = useAuthContext();

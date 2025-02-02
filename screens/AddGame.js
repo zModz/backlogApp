@@ -16,7 +16,7 @@ import Modal from "react-native-modal";
 
 import SearchCard from "../components/SearchCard";
 import GameModal from "../components/GameModal";
-import useGame from "../hooks/fetchGame";
+import useGame from "../hooks/useGame";
 import { useNavigation } from "@react-navigation/native";
 
 import { useTheme } from "../context/themeContext";

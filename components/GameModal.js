@@ -8,8 +8,8 @@ import {
 } from "react-native";
 import { Button, Text } from "react-native-paper";
 
-import AddToBacklog from "../hooks/AddToBacklog";
-import CheckBacklog from "../hooks/checkBacklog";
+import useAddToBacklog from "../hooks/useAddToBacklog";
+import CheckBacklog from "../hooks/useCheckBacklog";
 import useGameDetails from "../hooks/useGameDetails";
 import { useAuthContext } from "../hooks/useAuthContext";
 
@@ -18,7 +18,6 @@ import { createStyles } from "../Styles";
 
 import TextWithIcon from "./TextWithIcon";
 import Loading from "./Loading";
-import useAddToBacklog from "../hooks/AddToBacklog";
 import { StatusBar } from "expo-status-bar";
 
 const GameModal = ({ game, auth }) => {

@@ -13,10 +13,11 @@ import { useNavigation } from "@react-navigation/native";
 import { useTheme } from "../context/themeContext";
 import { createStyles } from "../Styles";
 
-import useGame from "../hooks/fetchGame";
+import useGame from "../hooks/useGame";
 import { useAuthContext } from "../hooks/useAuthContext";
 import ImageGameCard from "../components/ImageGameCard";
 import Loading from "../components/Loading";
+import useUpdateChecker from "../hooks/useUpdateChecker";
 
 const Home = ({ route }) => {
   const [state, setState] = React.useState({ open: false });
@@ -35,6 +36,8 @@ const Home = ({ route }) => {
   const styles = createStyles(theme);
 
   const { isLoading, fetchGameData } = useGame();
+
+  // const updateAvailable = useUpdateChecker();
 
   useEffect(() => {
     fetchGameData(

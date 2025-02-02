@@ -83,10 +83,7 @@ const CustomDrawer = ({ drops, user }) => {
             color: "#9b9b9b",
           }}
         >
-          ARMORY v{Constants.expoConfig.version}.
-          {Platform.OS === "ios"
-            ? Constants.expoConfig.ios.buildNumber
-            : Constants.expoConfig.android.versionCode}
+          ARMORY v{Constants.expoConfig.version}
         </Text>
       </View>
     </View>
