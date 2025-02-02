@@ -17,10 +17,11 @@ const Loading = () => {
 
   const loadingTexts = [
     "Searching the boxes...", //Mgs
-    "Loading new world...", // Minecraft
+    "Generating new world...", // Minecraft
     "Adquiring Cyberware...", // cbp2077
     "Looking for headcrabs...", //hl2
     "Gathering materia...", // FF7
+    "Rippin' N'Tearin'", // Doom
   ];
 
   // Pick a random string
@@ -44,5 +45,3 @@ const Loading = () => {
 };
 
 export default Loading;
-
-const styles = StyleSheet.create({});

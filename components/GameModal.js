@@ -39,9 +39,22 @@ const GameModal = ({ game, auth }) => {
   const { theme } = useTheme();
   const styles = createStyles(theme);
 
-  console.log(gameDetails);
-  
-  if (!isLoading) {
+  if (isLoading) {
+    return (
+      <View
+        style={{
+          backgroundColor: theme.colors.primary,
+          borderTopRightRadius: 20,
+          borderTopLeftRadius: 20,
+          padding: 10,
+        }}
+      >
+        <Loading />
+      </View>
+    );
+  }
+
+  if (!gameDetails) {
     return (
       <View
         style={{
@@ -217,7 +230,16 @@ const GameModal = ({ game, auth }) => {
           padding: 10,
         }}
       >
-        <Loading />
+        <Text
+          style={{
+            color: theme.colors.text,
+            fontSize: 14,
+            alignSelf: "center",
+            margin: 15,
+          }}
+        >
+          No Info Found!
+        </Text>
       </View>
     );
   }
