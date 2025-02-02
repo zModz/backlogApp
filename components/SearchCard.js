@@ -1,8 +1,5 @@
 import { View, Image } from "react-native";
-import {
-  IconButton,
-  Text,
-} from "react-native-paper";
+import { ActivityIndicator, IconButton, Text } from "react-native-paper";
 import React, { useState } from "react";
 
 import BaseCard from "./BaseCard";
@@ -11,40 +8,60 @@ import CheckBacklog from "../hooks/checkBacklog";
 import { useTheme } from "../context/themeContext";
 import { createStyles } from "../Styles";
 import TextWithIcon from "./TextWithIcon";
+import { useAuthContext } from "../hooks/useAuthContext";
+import useAddToBacklog from "../hooks/AddToBacklog";
+import useGameDetails from "../hooks/useGameDetails";
 
 const SearchCard = ({ game }) => {
-  const { user } = useAuthContext();
+  const { user, auth } = useAuthContext();
+
+  const [backlogStatus, setBacklogStatus] = useState(false);
+  const { addToBacklog, isAdding } = useAddToBacklog();
+  const { gameDetails, isLoading } = useGameDetails(game, auth) || {};
+
   // theme
   const { theme } = useTheme();
   const styles = createStyles(theme);
 
   const checkIfGameInBacklog = async () => {
     const isInBacklog = await CheckBacklog(user, game.id);
-    console.log(
-      isInBacklog
-        ? `Game ${game.name} is in backlog`
-        : `Game ${game.name} is not in backlog`
-    );
+    setBacklogStatus(isInBacklog);
   };
 
   checkIfGameInBacklog();
 
+  const addBacklogClick = () => {
+    if (!isLoading) {
+      addToBacklog(gameDetails);
+    }
+  };
+
   return (
     <BaseCard>
-      {game.id != null && (
+      {/* {game.id != null && !isAdding ? (
         <IconButton
-          icon={"plus"}
+          icon={!backlogStatus ? "plus" : "check"}
           iconColor={theme.colors.text}
           size={21}
           style={{
-            backgroundColor: theme.colors.primary,
+            backgroundColor: !backlogStatus
+              ? theme.colors.primary
+              : theme.colors.accent,
             position: "absolute",
             right: 2,
             top: 2,
           }}
-          onPress={() => {}}
+          onPress={!backlogStatus ? () => addBacklogClick() : () => {}}
         />
-      )}
+      ) : (
+        <ActivityIndicator
+          style={{
+            position: "absolute",
+            right: 2,
+            top: 2,
+          }}
+        />
+      )} */}
       <View style={{ flexDirection: "row" }}>
         <Image
           source={{

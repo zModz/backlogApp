@@ -9,11 +9,7 @@ import {
   Platform,
   RefreshControl,
 } from "react-native";
-import {
-  IconButton,
-  SegmentedButtons,
-  TextInput,
-} from "react-native-paper";
+import { IconButton, SegmentedButtons, TextInput } from "react-native-paper";
 import * as EXPO from "expo-status-bar";
 
 import Modal from "react-native-modal";
@@ -69,10 +65,10 @@ const AddGame = ({ route }) => {
   const handleSearch = () => {
     if (text != "") {
       const body =
-        `fields cover.url, name, release_dates.date, genres.name, category, involved_companies.*, screenshots.url, platforms, status, summary, rating; search "` +
+        `fields cover.url, name, release_dates.date, genres.name, category, screenshots.url, status, summary, rating; search "` +
         text +
         `'%"; where version_parent = null & category = (0,1,6,8);limit 10;`;
-  
+
       fetchGameData(auth, body).then((data) => {
         const sortedData = sortGames(data, sort); // Apply sorting after data is fetched
         setQuery(sortedData); // Update state with the sorted data
@@ -101,6 +97,7 @@ const AddGame = ({ route }) => {
         backdropTransitionInTiming={1000}
         backdropTransitionOutTiming={500}
         propagateSwipe={true}
+        statusBarTranslucent={true}
         style={{ justifyContent: "flex-end", margin: 0 }}
       >
         <GameModal game={modalData} auth={auth} />
@@ -201,7 +198,7 @@ const AddGame = ({ route }) => {
               <ScrollView
                 contentContainerStyle={{
                   paddingHorizontal: 15,
-                  paddingBottom: 330,
+                  paddingBottom: 350,
                 }}
                 scrollEventThrottle={16} // Smooth scrolling updates
                 refreshControl={

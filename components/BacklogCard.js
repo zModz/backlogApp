@@ -100,10 +100,10 @@ const BacklogCard = ({ game }) => {
             {game.genres !== undefined ? game.genres : ""}
           </TextWithIcon>
           <TextWithIcon icon={"calendar-clock-outline"}>
-            {game.release_date == undefined ? "N/A" : game.release_date}
+            {game.release_date == undefined ? "N/A" : game.release_date[0]}
           </TextWithIcon>
           <TextWithIcon icon={"code-not-equal-variant"}>
-            {game.dev}
+            {game.developer[0].name}
           </TextWithIcon>
         </View>
       </View>

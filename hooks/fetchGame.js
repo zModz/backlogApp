@@ -8,21 +8,6 @@ const useGame = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const getDeveloper = async (developerId, token) => {
-    const body = `fields id,company; where id=${developerId};limit 10;`;
-    return fetchData(API_URL, "involved_companies", body, token);
-  };
-
-  const getCompany = async (companyId, token) => {
-    const body = `fields id,name; where id=${companyId};limit 10;`;
-    return fetchData(API_URL, "companies", body, token);
-  };
-
-  const getPlatform = async (platformId, token) => {
-    const body = `fields id,name; where id=${platformId};limit 10;`;
-    return fetchData(API_URL, "platforms", body, token);
-  };
-
   const convertDate = (date) => {
     return new Date(date * 1000).toLocaleDateString("pt-PT");
   };
@@ -46,26 +31,6 @@ const useGame = () => {
     if (gamesData && gamesData.length > 0) {
       const gamesWithDevAndPlatform = await Promise.all(
         gamesData.map(async (game) => {
-          // const developerId =
-          //   game.involved_companies?.map(
-          //     (involvedCompany) => involvedCompany.id
-          //   ) || "N/A";
-          // const companyId =
-          //   game.involved_companies?.map(
-          //     (involvedCompany) => involvedCompany.company
-          //   ) || "N/A";
-          // const platformIds = game.platforms;
-
-          // await Promise.all(developerId.map((id) => getDeveloper(id, token)));
-
-          // const companyData = await Promise.all(
-          //   companyId.map((id) => getCompany(id, token))
-          // );
-
-          // const platformData = await Promise.all(
-          //   platformIds.map((id) => getPlatform(id, token))
-          // );
-
           const releaseDate =
             game.release_dates
               ?.map((date) => new Date(date.date))
@@ -80,8 +45,6 @@ const useGame = () => {
           return {
             id: game.id,
             name: game.name,
-            // developer: companyData.map((data) => data[0]),
-            // platforms: platformData.map((data) => data[0]),
             genres: genres,
             release_date: releaseDate,
             category: getCategory(game.category),

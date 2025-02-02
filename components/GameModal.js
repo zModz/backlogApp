@@ -1,71 +1,51 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
   View,
   Image,
   ImageBackground,
   ScrollView,
-  TouchableHighlight,
-  TouchableOpacity,
   TouchableWithoutFeedback,
-  Alert,
 } from "react-native";
-import { ActivityIndicator, Button, Icon, Text } from "react-native-paper";
+import { Button, Text } from "react-native-paper";
 
-import axios from "axios";
-
-import AddToBacklog from "./AddToBacklog";
+import AddToBacklog from "../hooks/AddToBacklog";
+import CheckBacklog from "../hooks/checkBacklog";
+import useGameDetails from "../hooks/useGameDetails";
 import { useAuthContext } from "../hooks/useAuthContext";
-import { useBacklogContext } from "../hooks/useBacklogContext";
+
+import { useTheme } from "../context/themeContext";
+import { createStyles } from "../Styles";
+
 import TextWithIcon from "./TextWithIcon";
+import Loading from "./Loading";
+import useAddToBacklog from "../hooks/AddToBacklog";
+import { StatusBar } from "expo-status-bar";
 
 const GameModal = ({ game, auth }) => {
-  const [dev, setDev] = useState("");
+  const [backlogStatus, setBacklogStatus] = useState(false);
+  const { addToBacklog, isAdding } = useAddToBacklog();
 
+  const { gameDetails, isLoading } = useGameDetails(game, auth) || {};
   const { user } = useAuthContext();
-  const { dispatch } = useBacklogContext();
 
-  // const addBacklogClick = async () => {
-  //   if (!user) return;
+  const checkIfGameInBacklog = async () => {
+    const isInBacklog = await CheckBacklog(user, game.id);
+    setBacklogStatus(isInBacklog);
+  };
 
-  //   const res = await fetch(
-  //     process.env.EXPO_PUBLIC_SERVER_IP + "/api/backlog/" + user.backlogID,
-  //     {
-  //       method: "PATCH",
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //         Authorization: `Bearer ${user.token}`,
-  //       },
-  //       body: JSON.stringify({
-  //         id: game.id,
-  //         name: game.name,
-  //         dev: dev[0].name,
-  //         genres: genres,
-  //         category: category,
-  //         release_date: date,
-  //         images: {
-  //           cover: "https:" + game.cover.url.replace("t_thumb", "t_cover_big"),
-  //           screenshots: game.screenshots,
-  //         },
-  //       }),
-  //     }
-  //   );
+  checkIfGameInBacklog();
 
-  //   const json = await res.json();
-  //   console.log(json);
+  // theme
+  const { theme } = useTheme();
+  const styles = createStyles(theme);
 
-  //   if (res.ok) {
-  //     dispatch({ type: "ADD_BACKLOG", payload: json });
-  //     Alert.alert("Game Added!", "Have fun gaming!");
-  //   }
-  // };
-
-  // console.log(dev[0])
-
-  if (game != undefined) {
+  console.log(gameDetails);
+  
+  if (!isLoading) {
     return (
       <View
         style={{
-          backgroundColor: "#fff",
+          backgroundColor: theme.colors.surface,
           borderTopRightRadius: 20,
           borderTopLeftRadius: 20,
           minHeight: 550,
@@ -74,9 +54,9 @@ const GameModal = ({ game, auth }) => {
         <ImageBackground
           source={{
             uri:
-              game.images.screenshots != undefined
+              gameDetails.images.screenshots != undefined
                 ? "https:" +
-                  game.images.screenshots[0].url.replace(
+                  gameDetails.images.screenshots[0].url.replace(
                     "t_thumb",
                     "t_original"
                   )
@@ -115,7 +95,7 @@ const GameModal = ({ game, auth }) => {
             style={{
               width: 60,
               height: 5,
-              backgroundColor: "#fff",
+              backgroundColor: "white",
               borderRadius: 3,
               marginBottom: 15,
               alignSelf: "center",
@@ -125,8 +105,8 @@ const GameModal = ({ game, auth }) => {
             <Image
               source={{
                 uri:
-                  game.images != undefined
-                    ? game.images.cover
+                  gameDetails.images != undefined
+                    ? gameDetails.images.cover
                     : "https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/No-Image-Placeholder.svg/624px-No-Image-Placeholder.svg.png",
               }}
               width={150}
@@ -148,53 +128,69 @@ const GameModal = ({ game, auth }) => {
                 variant="bodyMedium"
                 style={{ fontStyle: "italic", color: "#9b9b9b" }}
               >
-                {game.category !== undefined ? game.category : ""}
+                {gameDetails.category !== undefined ? gameDetails.category : ""}
               </Text>
               <Text
                 variant="headlineSmall"
-                style={{ width: 155, fontWeight: "bold", color: "white" }}
+                style={{
+                  width: 155,
+                  fontWeight: "bold",
+                  color: theme.colors.text,
+                }}
               >
-                {game.name != null ? game.name : "N/A"}
+                {gameDetails.name != null ? gameDetails.name : "N/A"}
               </Text>
-              {/* <Text
-                variant="titleMedium"
-                style={{ width: 215, color: "white" }}
-              >
-                {game.involved_companies[0]
-                  ? game.involved_companies[0].name
-                  : "N/A"}
-              </Text> */}
               <TextWithIcon icon={"puzzle"}>
-                {game.genres !== undefined ? game.genres : ""}
+                {gameDetails.genres !== undefined ? gameDetails.genres : ""}
               </TextWithIcon>
               <TextWithIcon icon={"calendar-clock-outline"}>
-                {game.release_date == undefined
+                {gameDetails.release_date == undefined
                   ? "N/A"
-                  : game.release_date.length > 1
-                  ? game.release_date[0] + "*"
-                  : game.release_date[0]}
+                  : gameDetails.release_date.length > 1
+                  ? gameDetails.release_date[0] + "*"
+                  : gameDetails.release_date[0]}
+              </TextWithIcon>
+              <TextWithIcon icon={"code-not-equal-variant"}>
+                {gameDetails.developer !== undefined
+                  ? gameDetails.developer[0].name
+                  : "N/A"}
               </TextWithIcon>
             </View>
           </View>
           <TouchableWithoutFeedback>
             <ScrollView nestedScrollEnabled={true}>
-              <Text variant="headlineSmall" style={{ fontWeight: "bold" }}>
+              <Text
+                variant="headlineSmall"
+                style={{ fontWeight: "bold", color: theme.colors.text }}
+              >
                 SUMMARY
               </Text>
               <ScrollView nestedScrollEnabled={true} style={{ maxHeight: 100 }}>
                 <TouchableWithoutFeedback>
-                  <Text variant="bodySmall" style={{ textAlign: "justify" }}>
-                    {game.summary}
+                  <Text
+                    variant="bodySmall"
+                    style={{ textAlign: "justify", color: theme.colors.text }}
+                  >
+                    {gameDetails.summary}
                   </Text>
                 </TouchableWithoutFeedback>
               </ScrollView>
-              <Text variant="headlineSmall" style={{ fontWeight: "bold" }}>
+              <Text
+                variant="headlineSmall"
+                style={{ fontWeight: "bold", color: theme.colors.text }}
+              >
                 INFO
               </Text>
             </ScrollView>
           </TouchableWithoutFeedback>
           <Button
             mode="elevated"
+            icon={!backlogStatus ? "plus" : "check"}
+            loading={isAdding}
+            buttonColor={
+              !backlogStatus ? theme.colors.primary : theme.colors.accent
+            }
+            textColor={theme.colors.text}
             style={{
               margin: 15,
               position: "absolute",
@@ -202,9 +198,11 @@ const GameModal = ({ game, auth }) => {
               left: 0,
               right: 0,
             }}
-            onPress={() => addBacklogClick()}
+            onPress={
+              !backlogStatus ? () => addToBacklog(gameDetails) : () => {}
+            }
           >
-            Add to Backlog
+            {!backlogStatus ? "Add to Backlog" : "Added to Backlog"}
           </Button>
         </View>
       </View>
@@ -213,13 +211,13 @@ const GameModal = ({ game, auth }) => {
     return (
       <View
         style={{
-          backgroundColor: "#fff",
+          backgroundColor: theme.colors.primary,
           borderTopRightRadius: 20,
           borderTopLeftRadius: 20,
           padding: 10,
         }}
       >
-        <ActivityIndicator />
+        <Loading />
       </View>
     );
   }
