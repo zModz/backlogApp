@@ -54,7 +54,7 @@ const GameModal = ({ game, auth }) => {
     );
   }
 
-  if (!gameDetails) {
+  if (gameDetails) {
     return (
       <View
         style={{

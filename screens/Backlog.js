@@ -27,8 +27,10 @@ const Backlog = () => {
   const { fetchBacklog, backlog, refreshing, error } = useFetchBacklog();
 
   useEffect(() => {
-    fetchBacklog(user);
-  }, []); // ✅ Runs only once when the component mounts
+    if (user) {
+      fetchBacklog(user);
+    }
+  }, [user]); // ✅ Runs only once when the component mounts
 
   useEffect(() => {
     setQuery(backlog); // ✅ Updates `query` when `backlog` changes
@@ -133,7 +135,7 @@ const Backlog = () => {
           Role-Playing (RPG)
         </Chip>
       </View>
-      {refreshing ? (
+      {refreshing || !user ? (
         <Loading />
       ) : (
         <ScrollView
@@ -143,7 +145,10 @@ const Backlog = () => {
             paddingBottom: 70,
           }}
           refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={fetchBacklog} />
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={() => fetchBacklog(user)}
+            />
           }
         >
           {backlog &&
