@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Image } from "react-native";
+import { View, Image, Platform } from "react-native";
 import { Avatar, Button, Divider, Text } from "react-native-paper";
 
 // React Drawer
@@ -83,7 +83,10 @@ const CustomDrawer = ({ drops, user }) => {
             color: "#9b9b9b",
           }}
         >
-          ARMORY v{Constants.expoConfig.version}
+          ARMORY v{Constants.expoConfig.version}.
+          {Platform.OS === "ios"
+            ? Constants.expoConfig.ios.buildNumber
+            : Constants.expoConfig.android.versionCode}
         </Text>
       </View>
     </View>
