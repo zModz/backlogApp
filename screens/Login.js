@@ -47,7 +47,9 @@ const Login = ({ navigation }) => {
       >
         <StatusBar style={theme.theme === "dark" ? "light" : "dark"} />
 
-        <KeyboardAvoidingView behavior={Platform.ios ? "padding" : "none"}>
+        <KeyboardAvoidingView
+          behavior={Platform.OS === "ios" ? "height" : "padding"}
+        >
           <View
             style={{
               flexShrink: 2,

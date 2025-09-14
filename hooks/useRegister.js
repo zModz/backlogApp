@@ -20,7 +20,10 @@ export const useRegister = () => {
         },
         body: JSON.stringify({ username, email, password }),
       }
-    );
+    ).catch((error) => {
+      setLoading(false);
+      Alert.alert("Server Error", error.message);
+    });
 
     const json = await res.json();
 

@@ -51,13 +51,14 @@ const Register = ({ navigation }) => {
       }}
     >
       <StatusBar style="auto" />
-      <View></View>
-      <KeyboardAvoidingView behavior={Platform.ios ? "padding" : "height"}>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "height" : "padding"}
+      >
         <View
           style={{
             elevation: 5,
             minWidth: 320,
-            maxHeight: 460,
+            height: 460,
             backgroundColor: theme.colors.surface,
             borderRadius: 15,
             padding: 5,
@@ -100,7 +101,6 @@ const Register = ({ navigation }) => {
             style={{
               backgroundColor: theme.colors.surface,
               margin: 5,
-              flexGrow: 2,
             }}
           />
           <TextInput
@@ -114,7 +114,6 @@ const Register = ({ navigation }) => {
             style={{
               backgroundColor: theme.colors.surface,
               margin: 5,
-              flexGrow: 2,
             }}
           />
           <TextInput
@@ -129,7 +128,6 @@ const Register = ({ navigation }) => {
             style={{
               backgroundColor: theme.colors.surface,
               margin: 5,
-              flexGrow: 2,
             }}
             right={
               <TextInput.Icon
@@ -150,7 +148,6 @@ const Register = ({ navigation }) => {
             style={{
               backgroundColor: theme.colors.surface,
               margin: 5,
-              flexGrow: 2,
             }}
             right={
               <TextInput.Icon

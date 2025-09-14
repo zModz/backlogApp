@@ -9,7 +9,13 @@ import {
   Platform,
   RefreshControl,
 } from "react-native";
-import { IconButton, SegmentedButtons, TextInput } from "react-native-paper";
+import {
+  Icon,
+  IconButton,
+  SegmentedButtons,
+  TextInput,
+  ToggleButton,
+} from "react-native-paper";
 import * as EXPO from "expo-status-bar";
 
 import Modal from "react-native-modal";
@@ -24,19 +30,26 @@ import { createStyles } from "../Styles";
 import Loading from "../components/Loading";
 
 // Define your custom sorting logic
-const sortGames = (games, option) => {
-  switch (option) {
-    case "name":
-      return games.sort((a, b) => a.name.localeCompare(b.name)); // Sort by name alphabetically
-    case "release_date":
-      return games.sort(
-        (a, b) => a.release_date.date[0] - b.release_date.date[0]
-      ); // Sort by release date
-    case "rating":
-      return games.sort((a, b) => b.rating - a.rating); // Sort by rating (highest first)
-    default:
-      return games;
-  }
+const sortGames = (games, option, order = "asc") => {
+  return [...games].sort((a, b) => {
+    let comparison = 0;
+
+    switch (option) {
+      case "name":
+        comparison = a.name.localeCompare(b.name);
+        break;
+      case "release_date":
+        comparison = a.release_date.date[0] - b.release_date.date[0];
+        break;
+      case "rating":
+        comparison = b.rating - a.rating; // Default: Highest first
+        break;
+      default:
+        return 0;
+    }
+
+    return order === "asc" ? comparison : -comparison;
+  });
 };
 
 // AddGame component definition
@@ -55,11 +68,17 @@ const AddGame = ({ route }) => {
   const [text, setText] = React.useState("");
   const [query, setQuery] = useState([]);
   const [sort, setSort] = useState("name");
+  const [sortOrder, setSortOrder] = useState("asc"); // Default order is ascending
 
   const { isLoading, fetchGameData } = useGame();
 
   const toggleModal = () => {
     setModalVisible(!isModalVisible);
+  };
+
+  const toggleSort = () => {
+    sortOrder = sortOrder === "asc" ? "desc" : "asc"; // Toggle order
+    setSortOrder(newOrder);
   };
 
   const handleSearch = () => {
@@ -70,7 +89,7 @@ const AddGame = ({ route }) => {
         `'%"; where version_parent = null & category = (0,1,6,8);limit 10;`;
 
       fetchGameData(auth, body).then((data) => {
-        const sortedData = sortGames(data, sort); // Apply sorting after data is fetched
+        const sortedData = sortGames(data, sort, sortOrder); // Apply sorting after data is fetched
         setQuery(sortedData); // Update state with the sorted data
       });
     }
@@ -158,7 +177,7 @@ const AddGame = ({ route }) => {
       </View>
       <View>
         <SafeAreaView>
-          <SegmentedButtons
+          {/* <SegmentedButtons
             value={sort}
             onValueChange={setSort}
             buttons={[
@@ -188,6 +207,37 @@ const AddGame = ({ route }) => {
               marginHorizontal: 15,
               marginVertical: 10,
             }}
+          /> */}
+          <Text>
+            {sort} {sortOrder}
+          </Text>
+          <ToggleButton
+            icon={() => (
+              <Icon
+                source={
+                  sortOrder === "asc"
+                    ? "sort-alphabetical-ascending"
+                    : "sort-alphabetical-descending"
+                }
+                size={20}
+                color="red"
+              />
+            )}
+            value="name"
+            status={sort === "name" ? "checked" : "unchecked"}
+            onPress={() => setSort("name")}
+          />
+          <ToggleButton
+            icon="sort-calendar-ascending"
+            value="release_date"
+            status={sort === "release_date" ? "checked" : "unchecked"}
+            onPress={() => setSort("release_date")}
+          />
+          <ToggleButton
+            icon="sort-numeric-descending"
+            value="rating"
+            status={sort === "rating" ? "checked" : "unchecked"}
+            onPress={() => setSort("rating")}
           />
           {isLoading ? (
             <Loading />

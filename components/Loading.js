@@ -8,7 +8,6 @@ import { createStyles } from "../Styles";
 const { width } = Dimensions.get("window");
 
 const scale = width / 320;
-console.log(scale);
 
 const Loading = () => {
   // theme

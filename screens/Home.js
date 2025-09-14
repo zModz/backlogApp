@@ -100,45 +100,48 @@ const Home = ({ route }) => {
           </View>
         </View>
       </View>
-      <View style={{ padding: 10 }}>
-        <Text
-          variant="headlineLarge"
-          style={{ color: theme.colors.text, marginBottom: 10 }}
-        >
-          Stats
-        </Text>
-        <View
-          style={{
-            height: 250,
-            backgroundColor: theme.colors.surface,
-            borderRadius: 15,
+      <ScrollView showsVerticalScrollIndicator={false}>
+        <View style={{ padding: 10 }}>
+          <Text
+            variant="headlineLarge"
+            style={{ color: theme.colors.text, marginBottom: 10 }}
+          >
+            Stats
+          </Text>
+          <View
+            style={{
+              height: 250,
+              backgroundColor: theme.colors.surface,
+              borderRadius: 15,
 
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          <Text style={{ color: theme.colors.text }}>Coming Soon™</Text>
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <Text style={{ color: theme.colors.text }}>Coming Soon™</Text>
+          </View>
         </View>
-      </View>
-      <View style={{ padding: 10 }}>
-        <View style={{ marginBottom: 10 }}>
-          <Text variant="headlineLarge" style={{ color: theme.colors.text }}>
-            Discover
-          </Text>
-          <Text variant="labelSmall" style={{ color: theme.colors.text }}>
-            Showing games with a rating of 75 or highter
-          </Text>
+        <View style={{ padding: 10 }}>
+          <View style={{ marginBottom: 10 }}>
+            <Text variant="headlineLarge" style={{ color: theme.colors.text }}>
+              Discover
+            </Text>
+            <Text variant="labelSmall" style={{ color: theme.colors.text }}>
+              Showing games with a rating of 75 or highter
+            </Text>
+          </View>
+          {isLoading ? (
+            <Loading />
+          ) : (
+            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+              <View style={{ minWidth: 1, flexDirection: "row" }}>
+                {game &&
+                  game?.map((g) => <ImageGameCard key={g.id} game={g} />)}
+              </View>
+            </ScrollView>
+          )}
         </View>
-        {isLoading ? (
-          <Loading />
-        ) : (
-          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-            <View style={{ minWidth: 1, flexDirection: "row" }}>
-              {game && game?.map((g) => <ImageGameCard key={g.id} game={g} />)}
-            </View>
-          </ScrollView>
-        )}
-      </View>
+      </ScrollView>
       <FAB.Group
         open={open}
         label={open ? "" : "Add"}
