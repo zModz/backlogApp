@@ -1,11 +1,17 @@
 import AuthContextProvider from "@/contexts/AuthContext";
 import { ThemeProvider, useThemeContext } from "@/contexts/ThemeContext";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import {
+  QueryClient,
+  QueryClientProvider,
+  useQueryClient,
+} from "@tanstack/react-query";
 import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import { useState } from "react";
-import { PaperProvider } from "react-native-paper";
+import { useEffect, useState } from "react";
+import { PaperProvider, Text } from "react-native-paper";
+import NetInfo from "@react-native-community/netinfo";
+import { View } from "react-native";
 
 function RootLayoutInner() {
   const { theme } = useThemeContext();
@@ -17,6 +23,31 @@ function RootLayoutInner() {
     "Rotobo-Italic": require("@/assets/fonts/Roboto/Roboto-Italic-VariableFont.ttf"),
   });
 
+  function OnlineWatcher() {
+    const queryClient = useQueryClient();
+    const [isConnected, setIsConnected] = useState(true);
+
+    useEffect(() => {
+      const unsub = NetInfo.addEventListener((state) => {
+        const connected = !!(state.isConnected && state.isInternetReachable);
+        setIsConnected(connected);
+
+        if (connected) {
+          console.log("🔌 Online - refeching...");
+          queryClient.refetchQueries();
+        }
+      });
+
+      return () => unsub();
+    }, []);
+
+    return (
+      <View style={{ position: "absolute", top: 40, right: 10 }}>
+        <Text>{isConnected ? "ONLINE" : "OFFLINE"}</Text>
+      </View>
+    );
+  }
+
   if (!loaded) {
     // Async font loading only occurs in development.
     return null;
@@ -27,6 +58,7 @@ function RootLayoutInner() {
       <AuthContextProvider>
         <PaperProvider theme={theme}>
           <StatusBar style={theme.dark ? "light" : "dark"} />
+          <OnlineWatcher />
           <Stack
             screenOptions={{
               headerShown: false,

@@ -17,7 +17,6 @@ import {
 } from "react-native";
 import { Button, FAB, MD3Theme, Searchbar, useTheme } from "react-native-paper";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-const searchbarRef = useRef<any>(null);
 
 const screenHeight = Dimensions.get("screen").height;
 
@@ -30,7 +29,7 @@ export default function Index() {
   const { backlog, backlogActions, isLoading } = useBacklogWithGames(auth);
   // const { backlog, loading, reload } = useBacklog();
 
-  // console.log("backlog: ", backlog[0].game);
+  console.log("backlog: ", backlog);
 
   // Floating Panel
   const [panelExpanded, setPanelExpanded] = useState(false);
@@ -38,6 +37,7 @@ export default function Index() {
     null
   );
   const panelControlsRef = useRef<{ reset: () => void; expand: () => void }>();
+  const searchbarRef = useRef<any>(null);
 
   const fabOpacity = panelTranslateY
     ? panelTranslateY.interpolate({
