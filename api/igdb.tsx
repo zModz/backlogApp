@@ -7,7 +7,11 @@ export async function fetchGameById(gameId: number, token: any) {
       "Content-Type": "text/plain",
     },
     body: `
-      fields cover.url, name, slug, platforms.name, release_dates.date, genres.name, summary, total_rating;
+      fields cover.url, name, slug, platforms.name, platforms.slug, release_dates.date, release_dates.platform.name,
+    release_dates.status.name, involved_companies.company.name, involved_companies.publisher, involved_companies.supporting,
+    involved_companies.developer, genres.name, category, screenshots.url, game_status.status, game_type.type, summary,
+    total_rating, game_modes.name, first_release_date, franchises.name, age_ratings.organization.name,
+    age_ratings.rating_category.rating, age_ratings.rating_cover_url, parent_game.name;
       where id = ${gameId};
       limit 1;
     `,
@@ -41,6 +45,8 @@ export const fetchGames = async ({ pageParam = 0, queryKey }) => {
       clauses.push(`first_release_date <= ${filters.releaseDateTo}`);
     if (filters.gameTypeIds?.length)
       clauses.push(`game_type = (${filters.gameTypeIds.join(",")})`);
+    if (filters.gameId?.length)
+      clauses.push(`id = (${filters.gameId.join(",")})`);
 
     if (clauses.length) whereClause = `where ${clauses.join(" & ")};`;
   }

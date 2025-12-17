@@ -30,9 +30,21 @@ export function useBacklog() {
     }
   }, []);
 
-  // Add a new game
+  // Add a new game (auto-build entry if only gameId is passed)
   const addToBacklog = useCallback(
-    async (entry: UserBacklogEntry) => {
+    async (entryOrId: UserBacklogEntry | number) => {
+      let entry: UserBacklogEntry;
+
+      if (typeof entryOrId === "number") {
+        entry = {
+          gameId: entryOrId,
+          status: "Backlog",
+          addedAt: new Date().toISOString(),
+        };
+      } else {
+        entry = entryOrId;
+      }
+
       const exists = backlog.find((b) => b.gameId === entry.gameId);
       if (!exists) {
         await saveBacklog([...backlog, entry]);
@@ -55,10 +67,14 @@ export function useBacklog() {
   // Remove a game
   const removeFromBacklog = useCallback(
     async (gameId: number) => {
-      const updated = backlog.filter((entry) => entry.gameId !== gameId);
-      await saveBacklog(updated);
+      setBacklog((prev) => {
+        const updated = prev.filter((entry) => entry.gameId !== gameId);
+        // persist after updating state
+        saveBacklog(updated);
+        return updated;
+      });
     },
-    [backlog, saveBacklog]
+    [saveBacklog]
   );
 
   // Check if a game is in backlog

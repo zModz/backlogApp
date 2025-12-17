@@ -5,7 +5,7 @@ import GameCard from "@/components/GameCard";
 import { useAuth } from "@/contexts/AuthContext";
 import { useBacklogWithGames } from "@/hook/useBacklogWithGames";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   Animated,
   Dimensions,

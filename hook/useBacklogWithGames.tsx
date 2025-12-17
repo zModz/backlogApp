@@ -14,7 +14,7 @@ function mapGame(game: any) {
     summary: game.summary || "No description",
     totalRating: game.total_rating || null,
     firstReleaseDate: game.first_release_date
-      ? new Date(game.first_release_date * 1000).toDateString()
+      ? new Date(game.first_release_date * 1000).toLocaleDateString()
       : null,
   };
 }
@@ -29,18 +29,18 @@ export function useBacklogWithGames(token: string) {
         const rawGame = await fetchGameById(entry.gameId, token);
         return mapGame(rawGame);
       },
-      enabled: !!token && !backlogActions.loading,
+      enabled: !!token && !backlogActions.loading && backlog.length > 0,
     })),
   });
 
+  // Map queries to game data (preserve alignment with backlog)
+  const games = gameQueries.map((q) => q.data ?? null);
+
   // Merge backlog entries with game details
   const backlogWithGames = backlog.map((entry, index) => {
-    const query = gameQueries[index];
     return {
       ...entry,
-      game: query?.data ?? null,
-      isLoading: query?.isLoading ?? true,
-      isError: query?.isError ?? false,
+      game: games[index],
     };
   });
 

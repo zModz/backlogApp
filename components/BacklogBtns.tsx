@@ -27,42 +27,50 @@ export const BacklogBtns = ({
           selected={isInBacklog}
           onPress={() => {
             if (!isInBacklog) {
-              backlogActions.addToBacklog({
-                gameId: game?.id,
-                status: "Backlog",
-                addedAt: new Date().toISOString(),
-              });
+              backlogActions.addToBacklog(game?.id);
               setSelected(true);
             } else {
               backlogActions.removeFromBacklog(game?.id);
               setSelected(false);
             }
+            backlogActions.reload();
           }}
           animated
         />
       )}
       {type === "backlog" && (
-        <IconButton
-          mode="contained"
-          icon={isCompleted ? "check-all" : "check"}
-          selected={isCompleted}
-          onPress={() => {
-            if (!isCompleted) {
-              backlogActions.updateBacklogEntry(game?.id, {
-                status: "Completed",
-                completedAt: new Date().toISOString(),
-              });
-              setCompleted(true);
-            } else {
-              backlogActions.updateBacklogEntry(game?.id, {
-                status: "Backlog",
-                completedAt: null,
-              });
-              setCompleted(false);
-            }
-          }}
-          animated
-        />
+        <>
+          <IconButton
+            mode="contained"
+            icon={isCompleted ? "check-all" : "check"}
+            selected={isCompleted}
+            onPress={() => {
+              if (!isCompleted) {
+                backlogActions.updateBacklogEntry(game?.id, {
+                  status: "Completed",
+                  completedAt: new Date().toISOString(),
+                });
+                setCompleted(true);
+              } else {
+                backlogActions.updateBacklogEntry(game?.id, {
+                  status: "Backlog",
+                  completedAt: null,
+                });
+                setCompleted(false);
+              }
+
+              backlogActions.reload();
+            }}
+            animated
+          />
+          {/* <IconButton
+            icon={"close"}
+            onPress={() => {
+              backlogActions.removeFromBacklog(game?.id);
+              backlogActions.reload();
+            }}
+          /> */}
+        </>
       )}
     </View>
   );
