@@ -34,7 +34,7 @@ export default ({ config }) => {
       bundleIdentifier: packageName,
     },
     notification: {
-      icon: "./assets/images/assets/images/armory_foreground_alt.png",
+      icon: "./assets/images/armory_foreground_alt.png",
       color: "#b7202dff",
     },
     android: {
