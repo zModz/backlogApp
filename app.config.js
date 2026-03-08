@@ -19,7 +19,7 @@ export default ({ config }) => {
     slug,
     version: "1.0.0",
     orientation: "portrait",
-    icon: "./assets/images/icon.png",
+    icon: "./assets/images/armory_icon.png",
     scheme: "backlogapp",
     userInterfaceStyle: "automatic",
     newArchEnabled: true,
@@ -34,16 +34,15 @@ export default ({ config }) => {
       bundleIdentifier: packageName,
     },
     notification: {
-      icon: "./assets/images/android-icon-foreground.png",
+      icon: "./assets/images/assets/images/armory_foreground_alt.png",
       color: "#b7202dff",
     },
     android: {
       ...config.android,
       adaptiveIcon: {
         backgroundColor: "#E6F4FE",
-        foregroundImage: "./assets/images/android-icon-foreground.png",
-        backgroundImage: "./assets/images/android-icon-background.png",
-        monochromeImage: "./assets/images/android-icon-monochrome.png",
+        foregroundImage: "./assets/images/armory_foreground_alt.png",
+        monochromeImage: "./assets/images/armory_foreground_monochrome.png",
       },
       edgeToEdgeEnabled: true,
       predictiveBackGestureEnabled: false,

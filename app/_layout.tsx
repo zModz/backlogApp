@@ -12,6 +12,7 @@ import { useEffect, useState } from "react";
 import { PaperProvider, Text } from "react-native-paper";
 import NetInfo from "@react-native-community/netinfo";
 import { View } from "react-native";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 function RootLayoutInner() {
   const { theme } = useThemeContext();
@@ -72,8 +73,10 @@ function RootLayoutInner() {
 
 export default function RootLayout() {
   return (
-    <ThemeProvider>
-      <RootLayoutInner />
-    </ThemeProvider>
+    <GestureHandlerRootView>
+      <ThemeProvider>
+        <RootLayoutInner />
+      </ThemeProvider>
+    </GestureHandlerRootView>
   );
 }

@@ -3,15 +3,18 @@ import { useInfiniteQuery } from "@tanstack/react-query";
 import React from "react";
 import {
   ActivityIndicator,
-  FlatList,
   StyleSheet,
   Text,
   View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import GameCard from "./GameCard";
+import Animated, { useAnimatedScrollHandler } from "react-native-reanimated";
+import { FlatList } from "react-native-gesture-handler";
 
-const GameList = ({ search, token }) => {
+const AnimFlatlist = Animated.createAnimatedComponent(FlatList);
+
+const GameList = ({ search, token, onScroll }) => {
   const insets = useSafeAreaInsets();
 
   const {
@@ -47,13 +50,21 @@ const GameList = ({ search, token }) => {
     );
   }
 
+  
+  const handleScroll = useAnimatedScrollHandler({
+      onScroll: (event) => {
+        onScroll.value = event.contentOffset.y;
+      },
+    });
+
   const games = data?.pages?.flat() ?? [];
 
   const renderItem = ({ item }) => <GameCard type="search" game={item} />;
 
   return (
-    <FlatList
+    <AnimFlatlist
       data={games}
+      onScroll={handleScroll}
       keyExtractor={(item) => item.id}
       renderItem={renderItem}
       onEndReached={() => {

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { View } from "react-native";
 import { Searchbar } from "react-native-paper";
 import GameList from "./GameList";
+import { useAnimatedScrollHandler } from "react-native-reanimated";
 
 export function useDebounce(value: string, delay = 500) {
   const [debouncedValue, setDebouncedValue] = useState(value);
@@ -17,9 +18,12 @@ export function useDebounce(value: string, delay = 500) {
   return debouncedValue;
 }
 
-const AddGame = ({ auth, ref }) => {
+
+const AddGame = ({ auth, ref, onScroll }) => {
   const [search, setSearch] = useState("");
   const debouncedSearch = useDebounce(search, 600); // wait 600ms after typing
+
+  
 
   return (
     <View>
@@ -30,7 +34,7 @@ const AddGame = ({ auth, ref }) => {
         value={search}
         onChangeText={setSearch}
       />
-      <GameList search={debouncedSearch} token={auth} />
+      <GameList search={debouncedSearch} token={auth} onScroll={onScroll} />
     </View>
   );
 };

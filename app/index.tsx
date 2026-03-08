@@ -16,6 +16,7 @@ import {
   View,
 } from "react-native";
 import { Button, FAB, MD3Theme, Searchbar, useTheme } from "react-native-paper";
+import { interpolate, useDerivedValue, useSharedValue } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const screenHeight = Dimensions.get("screen").height;
@@ -29,23 +30,21 @@ export default function Index() {
   const { backlog, backlogActions, isLoading } = useBacklogWithGames(auth);
   // const { backlog, loading, reload } = useBacklog();
 
-  console.log("backlog: ", backlog);
-
   // Floating Panel
   const [panelExpanded, setPanelExpanded] = useState(false);
-  const [panelTranslateY, setpanelTranslateY] = useState<Animated.Value | null>(
-    null
-  );
+  const panelTranslateY = useSharedValue(screenHeight);
+
   const panelControlsRef = useRef<{ reset: () => void; expand: () => void }>();
   const searchbarRef = useRef<any>(null);
 
-  const fabOpacity = panelTranslateY
-    ? panelTranslateY.interpolate({
-        inputRange: [insets.top, 999],
-        outputRange: [0, 1], // 0 when expanded, 1 when collapsed
-        extrapolate: "clamp",
-      })
-    : 1;
+ const fabOpacity = useDerivedValue(() => {
+    return interpolate(
+      panelTranslateY.value,
+      [screenHeight, insets.top],
+      [1, 0],
+      "clamp"
+    );
+  });
 
   // Filter games only when backlog is loaded and not empty
   const filteredGames = Array.isArray(backlog)
@@ -109,11 +108,14 @@ export default function Index() {
           setPanelExpanded(true);
           searchbarRef.current?.focus();
         }}
-        onTranslateYChange={setpanelTranslateY}
+        height={screenHeight}
+        translateY={panelTranslateY}
+        damping={70}
+        stiffness={555}
       >
-        {(isExpanded, controls) => {
+        {(isExpanded, controls, onScroll) => {
           panelControlsRef.current = controls;
-          return <AddGame auth={auth} ref={searchbarRef} />;
+          return <AddGame auth={auth} ref={searchbarRef} onScroll={onScroll} />;
         }}
       </FloatingPanel>
       {panelTranslateY && (
@@ -124,7 +126,7 @@ export default function Index() {
             right: 0,
             bottom: insets.bottom,
             zIndex: 999,
-            opacity: fabOpacity,
+            opacity: fabOpacity.value,
             flexDirection: "column-reverse",
             alignItems: "center",
           }}
@@ -134,6 +136,7 @@ export default function Index() {
             icon={"plus"}
             onPress={() => {
               panelControlsRef.current?.expand(); // expand panel
+              searchbarRef.current?.focus();
             }}
           />
         </Animated.View>

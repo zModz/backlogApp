@@ -1,15 +1,29 @@
-import React, { useRef } from "react";
+import { useFocusEffect, useNavigation } from "expo-router";
+import React, { useCallback, useRef, useState } from "react";
 import {
-  Animated,
+  BackHandler,
   Dimensions,
-  PanResponder,
-  StatusBar,
+  FlatList,
+  ScrollView,
   StyleSheet,
   View,
 } from "react-native";
 import { IconButton, useTheme } from "react-native-paper";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-const screenHeight = Dimensions.get("window").height;
+import Animated, {
+  interpolate,
+  runOnJS,
+  SharedValue,
+  useAnimatedReaction,
+  useAnimatedStyle,
+  useSharedValue,
+  withSpring,
+} from "react-native-reanimated";
+
+import { Gesture, GestureDetector } from "react-native-gesture-handler";
+
+const { height: screenHeight } = Dimensions.get("window");
 
 export default function FloatingPanel({
   collapsedY,
@@ -17,8 +31,11 @@ export default function FloatingPanel({
   onCollapse,
   onExpand,
   children,
-  onTranslateYChange,
+  translateY,
+  height,
   dragEnabled = true,
+  damping,
+  stiffness,
 }: {
   collapsedY: number;
   expandedY: number;
@@ -26,122 +43,270 @@ export default function FloatingPanel({
   onExpand: () => void;
   children: (
     isExpanded: boolean,
-    controls: { reset: () => void; expand: () => void }
+    controls: { reset: () => void; expand: () => void },
+    scrollRef: React.RefObject<FlatList<any> | ScrollView>,
+    onScroll: number
   ) => React.ReactNode;
-  onTranslateYChange?: (value: Animated.Value) => void;
+  translateY: SharedValue<number>;
+  // onTranslateYChange?: SharedValue<number>;
+  height?: number;
   dragEnabled?: boolean;
+  damping: number,
+  stiffness: number,
 }) {
-  const translateY = useRef(new Animated.Value(collapsedY)).current;
-  const lastOffset = useRef(collapsedY);
   const theme = useTheme();
+  const insets = useSafeAreaInsets();
+  const navigation = useNavigation();
 
-  React.useEffect(() => {
-    if (onTranslateYChange) {
-      onTranslateYChange(translateY);
-    }
-  }, [onTranslateYChange, translateY]);
+  // Shared animation state
+  // const translateY = useSharedValue(collapsedY);
+  const contextY = useSharedValue(collapsedY);
+  const [isExpanded, setIsExpanded] = useState(false);
+  const isAnimating = useSharedValue(false);
+  const onScroll = useSharedValue(0);
+  const scrollRef = useRef<FlatList | ScrollView>(null);
+  const panelHeight = height + insets.bottom; // defined height + bottom inset overlap
+
+  useAnimatedReaction(
+    () => translateY.value,
+    (currentValue, previousValue) => {
+      if (currentValue !== previousValue) {
+        const expanded = currentValue <= collapsedY - 5;
+        runOnJS(setIsExpanded)(expanded);
+      }
+    },
+    [expandedY]
+  );
+
+  // useEffect(() => {
+  //   if (onTranslateYChange) onTranslateYChange(translateY);
+  // }, [translateY, onTranslateYChange]);
+
+  /** --- Core animation functions --- */
+  // const animateTo = useCallback(
+  //   (toValue: number, callback?: () => void) => {
+  //     "worklet";
+
+  //     isAnimating.value = true;
+
+  //     translateY.value = withSpring(
+  //       toValue,
+  //       {
+  //         damping: 20,
+  //         stiffness: 180,
+  //         overshootClamping: false,
+  //       },
+  //       (finished) => {
+  //         "worklet";
+
+  //         if (finished) {
+  //           isAnimating.value = false;
+
+  //           if (toValue === expandedY) setIsExpanded(true);
+  //           else setIsExpanded(false);
+
+  //           if (callback) runOnJS(callback)();
+  //         }
+  //       }
+  //     );
+  //   },
+  //   [expandedY]
+  // );
+
+  const animateTo = (toValue: number, callback?: () => void) => {
+    "worklet";
+
+    isAnimating.value = true;
+
+    translateY.value = withSpring(
+      toValue,
+      {
+        damping: damping,
+        stiffness: stiffness,
+        overshootClamping: false,
+      },
+      (finished) => {
+        "worklet";
+
+        if (!finished) return;
+
+        isAnimating.value = false;
+
+        //
+        // if (toValue === expandedY) setIsExpanded(true);
+        // else setIsExpanded(false);
+
+        // JS state updates
+        if (finished && callback) {
+          runOnJS(callback)();
+        }
+      }
+    );
+  };
+
+  // const reset = useCallback(
+  //   () => animateTo(collapsedY, onCollapse),
+  //   [animateTo, collapsedY, onCollapse]
+  // );
+  // const expand = useCallback(
+  //   () => animateTo(expandedY, onExpand),
+  //   [animateTo, expandedY, onExpand]
+  // );
 
   const reset = () => {
-    Animated.spring(translateY, {
-      toValue: collapsedY,
-      useNativeDriver: true,
-    }).start(() => {
-      lastOffset.current = collapsedY;
-      onCollapse?.();
-    });
+    animateTo(collapsedY, onCollapse);
   };
 
   const expand = () => {
-    Animated.spring(translateY, {
-      toValue: expandedY,
-      useNativeDriver: true,
-    }).start(() => {
-      lastOffset.current = expandedY;
-      onExpand?.();
-    });
+    animateTo(expandedY, onExpand);
   };
 
-  const panResponder = useRef(
-    PanResponder.create({
-      onMoveShouldSetPanResponder: (_, gesture) => Math.abs(gesture.dy) > 5,
-      onPanResponderMove: (_, gesture) => {
-        const newY = lastOffset.current + gesture.dy;
-        translateY.setValue(Math.min(Math.max(newY, expandedY), collapsedY));
-      },
-      onPanResponderRelease: (_, gesture) => {
-        const shouldOpen = gesture.vy < 0 || gesture.moveY < screenHeight / 2;
-        const finalY = shouldOpen ? expandedY : collapsedY;
-        Animated.spring(translateY, {
-          toValue: finalY,
-          useNativeDriver: true,
-        }).start(() => {
-          lastOffset.current = finalY;
-          if (!shouldOpen) {
-            onCollapse?.();
-          } else {
-            onExpand?.();
-          }
-        });
-      },
+  /** --- Gesture setup --- */
+  const gesture = Gesture.Pan()
+    .enabled(dragEnabled)
+    .simultaneousWithExternalGesture(scrollRef)
+    .onBegin((event) => {
+      contextY.value = translateY.value;
     })
-  ).current;
+    .onUpdate((event) => {
+      const allowDrag = onScroll.value <= 0 || event.translationY < 0;
 
-  const isExpanded = translateY.__getValue() <= expandedY + 10;
+      if (!allowDrag) return;
 
-  // Overlay opacity based on panel position
-  const overlayOpacity = translateY.interpolate({
-    inputRange: [expandedY, collapsedY],
-    outputRange: [0.3, 0],
-    extrapolate: "clamp",
-  });
+      translateY.value = Math.min(
+        Math.max(contextY.value + event.translationY, expandedY),
+        collapsedY
+      );
+    })
+    .onEnd((event) => {
+      "worklet";
+      const expandThreshold = expandedY + 20; // 20pt above expanded
+      const collapseThreshold = collapsedY - 20; // 20pt below collapsed
+
+      let target;
+
+      if (translateY.value < expandThreshold) {
+        // Close enough to expanded → expand
+        target = expandedY;
+        runOnJS(onExpand)();
+      } else if (translateY.value > collapseThreshold) {
+        // Close enough to collapsed → collapse
+        target = collapsedY;
+        runOnJS(onCollapse)();
+      } else {
+        // In the dead zone → decide based on velocity or keep last state
+        target =
+          translateY.value < (collapsedY + expandedY) / 2
+            ? expandedY
+            : collapsedY;
+      }
+
+      if (target === expandedY) {
+        runOnJS(onExpand)();
+      } else {
+        runOnJS(onCollapse)();
+      }
+
+      translateY.value = withSpring(target);
+    });
+
+  const composed = Gesture.Simultaneous(gesture);
+
+  /** --- Animated styles --- */
+  const animatedPanelStyle = useAnimatedStyle(() => ({
+    transform: [{ translateY: translateY?.value }],
+  }));
+
+  const overlayAnimatedStyle = useAnimatedStyle(() => ({
+    opacity: interpolate(
+      translateY?.value,
+      [expandedY, collapsedY],
+      [0.3, 0],
+      "clamp"
+    ),
+  }));
+
+  /** --- Handle back button + navigation blur --- */
+  useFocusEffect(
+    useCallback(() => {
+      const onBackPress = () => {
+        if (isExpanded) {
+          reset();
+          return true;
+        }
+        return false;
+      };
+
+      const sub = BackHandler.addEventListener(
+        "hardwareBackPress",
+        onBackPress
+      );
+      const blurSub = navigation.addListener("blur", reset);
+
+      return () => {
+        sub.remove();
+        blurSub();
+      };
+    }, [isExpanded, reset])
+  );
+
+  if (!translateY) {
+    console.error(
+      "FloatingPanel: translateY is undefined. Make sure you pass a useSharedValue from the parent."
+    );
+    return null;
+  }
+
+  // const AnimSurface;
 
   return (
     <>
+      {/* Overlay */}
       <Animated.View
-        pointerEvents="none"
-        style={{
-          position: "absolute",
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          backgroundColor: "black",
-          opacity: overlayOpacity,
-        }}
+        pointerEvents={isExpanded ? "auto" : "none"}
+        style={[
+          StyleSheet.absoluteFill,
+          { backgroundColor: "black" },
+          overlayAnimatedStyle,
+        ]}
       />
 
-      <Animated.View
-        {...(dragEnabled ? panResponder.panHandlers : {})}
-        style={[
-          styles.panel,
-          {
-            transform: [{ translateY }],
-            backgroundColor: theme.colors.elevation.level2,
-          },
-        ]}
-      >
-        {expandedY !== 0 ? (
-          <View
-            style={[
-              styles.handle,
-              { backgroundColor: theme.colors.surfaceVariant },
-            ]}
-          />
-        ) : (
-          <View style={styles.header}>
-            <View style={{ flex: 1 }} />
-            <IconButton
-              icon={"close"}
-              onPress={reset}
-              style={{ position: "absolute", right: 16, top: 12, elevation: 8 }}
-              containerColor={theme.colors.primary}
-              iconColor={theme.colors.onPrimary}
-              accessibilityLabel="Close"
+      {/* Panel */}
+      <GestureDetector gesture={composed}>
+        <Animated.View
+          style={[
+            styles.panel,
+            animatedPanelStyle,
+            {
+              backgroundColor: theme.colors.elevation.level1,
+              height: panelHeight ?? 600,
+            },
+          ]}
+        >
+          {expandedY !== 0 ? (
+            <View
+              style={[
+                styles.handle,
+                { backgroundColor: theme.colors.onSurfaceVariant },
+              ]}
             />
+          ) : (
+            <View style={[styles.header, { marginTop: insets.top }]}>
+              <IconButton
+                icon="close"
+                onPress={() => reset()}
+                containerColor={theme.colors.primary}
+                iconColor={theme.colors.onPrimary}
+              />
+            </View>
+          )}
+
+          {/* Content */}
+          <View style={{ flex: 1, pointerEvents: "box-none" }}>
+            {children(isExpanded, { reset, expand }, scrollRef, onScroll)}
           </View>
-        )}
-        {children(isExpanded, { reset, expand })}
-      </Animated.View>
+        </Animated.View>
+      </GestureDetector>
     </>
   );
 }
@@ -151,32 +316,31 @@ const styles = StyleSheet.create({
     position: "absolute",
     left: 0,
     right: 0,
-    height: screenHeight,
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
-    elevation: 8,
+    elevation: 6,
     overflow: "hidden",
+    zIndex: 999,
   },
   handle: {
+    position: "absolute",
+    top: 0,
+    zIndex: 999,
     alignSelf: "center",
     width: 40,
     height: 5,
     borderRadius: 3,
     marginVertical: 8,
-    position: "absolute",
-    top: 0,
-    zIndex: 999,
   },
   header: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "flex-end",
-    height: 48,
-    marginTop: StatusBar.currentHeight,
     position: "absolute",
     top: 0,
-    left: 0,
-    right: 0,
     zIndex: 999,
+    right: 0,
+    flexDirection: "row",
+    justifyContent: "flex-end",
+    alignItems: "center",
+    height: 48,
+    paddingHorizontal: 16,
   },
 });
