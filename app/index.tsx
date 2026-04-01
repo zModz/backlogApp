@@ -3,6 +3,7 @@ import AppBar from "@/components/AppBar";
 import GameCard from "@/components/GameCard";
 import { useAuth } from "@/contexts/AuthContext";
 import { usePanel } from "@/contexts/PanelContext";
+import { useBacklog } from "@/hook/useBacklog";
 import { useBacklogWithGames } from "@/hook/useBacklogWithGames";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import React, { useRef, useState } from "react";
@@ -25,7 +26,7 @@ export default function Index() {
   const styles = makeStyles(theme);
   const insets = useSafeAreaInsets();
   const [search, setSearch] = useState("");
-  const { backlog, backlogActions, isLoading } = useBacklogWithGames(auth);
+  const { backlog, ...backlogActions } = useBacklog();
   const PANELHEIGHT = 600 + insets.bottom;
   const searchbarRef = useRef<any>(null);
 
@@ -88,7 +89,7 @@ export default function Index() {
           }}
           refreshControl={
             <RefreshControl
-              refreshing={isLoading}
+              refreshing={backlogActions.loading}
               onRefresh={backlogActions.reload}
             />
           }

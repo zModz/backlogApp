@@ -1,53 +1,36 @@
 import { useQueries } from "@tanstack/react-query";
 import { fetchGameById } from "../api/igdb";
 import { useBacklog } from "./useBacklog";
+import { AgeRating, Game, InvolvedCompany, Platform } from "@/mockdata";
 
-function mapGame(game: any) {
+export function mapGame(game: any): Game {
   return {
     id: game.id,
     name: game.name,
+    slug: game.slug,
     coverUrl:
       game.cover?.url?.replace("t_thumb", "t_cover_big") ||
       "https://upload.wikimedia.org/wikipedia/commons/a/a3/Image-not-found.png?20210521171500",
-    platforms: game.platforms?.map((p: any) => p.name) || [],
+    platforms: game.platforms?.map((p: Platform) => p.name) || [],
     genres: game.genres?.map((g: any) => g.name) || [],
     summary: game.summary || "No description",
     totalRating: game.total_rating || null,
     firstReleaseDate: game.first_release_date
       ? new Date(game.first_release_date * 1000).toLocaleDateString()
       : null,
-  };
-}
-
-export function useBacklogWithGames(token: string) {
-  const { backlog, ...backlogActions } = useBacklog();
-
-  const gameQueries = useQueries({
-    queries: backlog.map((entry) => ({
-      queryKey: ["game", entry.gameId],
-      queryFn: async () => {
-        const rawGame = await fetchGameById(entry.gameId, token);
-        return mapGame(rawGame);
-      },
-      enabled: !!token && !backlogActions.loading && backlog.length > 0,
-    })),
-  });
-
-  // Map queries to game data (preserve alignment with backlog)
-  const games = gameQueries.map((q) => q.data ?? null);
-
-  // Merge backlog entries with game details
-  const backlogWithGames = backlog.map((entry, index) => {
-    return {
-      ...entry,
-      game: games[index],
-    };
-  });
-
-  return {
-    backlog: backlogWithGames,
-    backlogActions,
-    isLoading: backlogActions.loading || gameQueries.some((q) => q.isLoading),
-    isError: gameQueries.some((q) => q.isError),
+    releaseDates: [],
+    involvedCompanies: game.involved_companies.map(
+      (c: InvolvedCompany) => c.company.name || [],
+    ),
+    gameType: game.game_type.map((t: any) => t.type) || [],
+    screenshots: game.screenshots || [],
+    gameStatus: "",
+    gameModes: game.game_modes.map((m: any) => m.name) || [],
+    franchises: game.franchises.map((f: any) => f.name) || [],
+    ageRatings:
+      game.age_ratings.map((r: AgeRating) => {
+        `${r.organization.name} ${r.rating_category.rating}`;
+      }) || [],
+    parentGame: game.parent_game.map((p: any) => p.name) || [],
   };
 }

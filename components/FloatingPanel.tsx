@@ -114,30 +114,27 @@ export default function FloatingPanel({
       const collapseThreshold = collapsedY - 20; // 20pt below collapsed
 
       let target;
+      let callback;
 
       if (translateY.value < expandThreshold) {
         // Close enough to expanded → expand
         target = expandedY;
-        runOnJS(onExpand)();
+        callback = onExpand;
       } else if (translateY.value > collapseThreshold) {
         // Close enough to collapsed → collapse
         target = collapsedY;
-        runOnJS(onCollapse)();
+        callback = onCollapse;
       } else {
         // In the dead zone → decide based on velocity or keep last state
         target =
           translateY.value < (collapsedY + expandedY) / 2
             ? expandedY
             : collapsedY;
+
+        callback = target === expandedY ? onExpand : onCollapse;
       }
 
-      if (target === expandedY) {
-        runOnJS(onExpand)();
-      } else {
-        runOnJS(onCollapse)();
-      }
-
-      translateY.value = withSpring(target);
+      animateTo(target, callback);
     });
 
   const composed = Gesture.Simultaneous(gesture);

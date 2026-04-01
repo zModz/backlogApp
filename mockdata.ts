@@ -527,27 +527,28 @@ export const mockUserBacklog = [
   },
 ];
 
-type Platform = {
+export type Platform = {
+  id: number;
   name: string;
   slug: string;
 };
 
-type ReleaseDate = {
+export type ReleaseDate = {
   date: string; // ISO date string
   platform: { name: string };
   status: string;
 };
 
-type InvolvedCompany = {
+export type InvolvedCompany = {
   company: { name: string };
   publisher: boolean;
   developer: boolean;
   supporting: boolean;
 };
 
-type AgeRating = {
-  organization: string;
-  rating: string;
+export type AgeRating = {
+  organization: { id: number; name: string };
+  rating_category: { id: number; rating: string };
   ratingCoverUrl: string;
 };
 
@@ -560,7 +561,6 @@ export type Game = {
   releaseDates: ReleaseDate[];
   involvedCompanies: InvolvedCompany[];
   genres: string[];
-  category: string;
   screenshots: string[];
   gameStatus: string;
   gameType: string;
@@ -577,6 +577,7 @@ type BacklogStatus = "Backlog" | "Playing" | "Completed" | "Dropped";
 
 export type UserBacklogEntry = {
   gameId: number; // reference to Game.id
+  game: Game;
   status: BacklogStatus;
   personalRating?: number | null;
   notes?: string | null;

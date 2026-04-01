@@ -1,12 +1,7 @@
 import { fetchGames } from "@/api/igdb";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import React from "react";
-import {
-  ActivityIndicator,
-  StyleSheet,
-  Text,
-  View,
-} from "react-native";
+import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import GameCard from "./GameCard";
 import Animated, { useAnimatedScrollHandler } from "react-native-reanimated";
@@ -34,6 +29,12 @@ const GameList = ({ search, token, onScroll }) => {
     initialPageParam: 0,
   });
 
+  const handleScroll = useAnimatedScrollHandler({
+    onScroll: (event) => {
+      onScroll.value = event.contentOffset.y;
+    },
+  });
+
   if (isLoading && !token) {
     return (
       <View>
@@ -49,13 +50,6 @@ const GameList = ({ search, token, onScroll }) => {
       </View>
     );
   }
-
-  
-  const handleScroll = useAnimatedScrollHandler({
-      onScroll: (event) => {
-        onScroll.value = event.contentOffset.y;
-      },
-    });
 
   const games = data?.pages?.flat() ?? [];
 

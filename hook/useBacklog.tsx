@@ -1,6 +1,8 @@
+import { fetchGameById } from "@/api/igdb";
 import { UserBacklogEntry } from "@/mockdata"; // TS types we made earlier
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useCallback, useEffect, useState } from "react";
+import { mapGame } from "./useBacklogWithGames";
 
 const BACKLOG_KEY = "@backlog";
 
@@ -32,36 +34,44 @@ export function useBacklog() {
 
   // Add a new game (auto-build entry if only gameId is passed)
   const addToBacklog = useCallback(
-    async (entryOrId: UserBacklogEntry | number) => {
-      let entry: UserBacklogEntry;
+    async (gameId: number, token: string) => {
+      try {
+        // Fetch and map first
+        const rawGame = await fetchGameById(gameId, token);
+        const mapppedGame = mapGame(rawGame);
 
-      if (typeof entryOrId === "number") {
-        entry = {
-          gameId: entryOrId,
+        // Only create entry if fetch is successful
+        const entry: UserBacklogEntry = {
+          gameId: gameId,
+          game: mapppedGame,
           status: "Backlog",
           addedAt: new Date().toISOString(),
         };
-      } else {
-        entry = entryOrId;
-      }
 
-      const exists = backlog.find((b) => b.gameId === entry.gameId);
-      if (!exists) {
-        await saveBacklog([...backlog, entry]);
+        const exists = backlog.find((b) => b.gameId === entry.gameId);
+        if (!exists) {
+          await saveBacklog([...backlog, entry]);
+          return { success: true, game: mapppedGame.name };
+        }
+
+        return { success: false, error: "Game already in backlog" };
+      } catch (error) {
+        console.error("[AddToBacklog] Error adding to Backlog: ", error);
+        return { success: false, error: error.message };
       }
     },
-    [backlog, saveBacklog]
+    [backlog, saveBacklog],
   );
 
   // Update a game entry
   const updateBacklogEntry = useCallback(
     async (gameId: number, updates: Partial<UserBacklogEntry>) => {
       const updated = backlog.map((entry) =>
-        entry.gameId === gameId ? { ...entry, ...updates } : entry
+        entry.gameId === gameId ? { ...entry, ...updates } : entry,
       );
       await saveBacklog(updated);
     },
-    [backlog, saveBacklog]
+    [backlog, saveBacklog],
   );
 
   // Remove a game
@@ -74,7 +84,7 @@ export function useBacklog() {
         return updated;
       });
     },
-    [saveBacklog]
+    [saveBacklog],
   );
 
   // Check if a game is in backlog
@@ -82,17 +92,17 @@ export function useBacklog() {
     (gameId: number): boolean => {
       return backlog.some((entry) => entry.gameId === gameId);
     },
-    [backlog]
+    [backlog],
   );
 
   //  Check if a game is completed
   const isCompleted = useCallback(
     (gameId: number): boolean => {
       return backlog.some(
-        (entry) => entry.gameId === gameId && entry.status === "Completed"
+        (entry) => entry.gameId === gameId && entry.status === "Completed",
       );
     },
-    [backlog]
+    [backlog],
   );
 
   // Load data on mount

@@ -66,7 +66,7 @@ const GameCard = ({ type, game }: gameCard) => {
             >
               {game?.name}
             </Text>
-            {/* <Text variant="labelMedium">{game.genres}</Text> */}
+            <Text variant="labelMedium">{game.genres}</Text>
             <Text variant="labelMedium">{game?.firstReleaseDate}</Text>
           </View>
         </View>

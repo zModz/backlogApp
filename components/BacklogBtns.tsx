@@ -1,9 +1,11 @@
+import { useAuth } from "@/contexts/AuthContext";
+import { Game } from "@/mockdata";
 import React, { useState } from "react";
 import { View } from "react-native";
 import { IconButton } from "react-native-paper";
 
 type BacklogBtnsProps = {
-  game: any;
+  game: Game;
   type: string;
   backlogActions: any;
 };
@@ -13,6 +15,7 @@ export const BacklogBtns = ({
   type,
   backlogActions,
 }: BacklogBtnsProps) => {
+  const { auth } = useAuth();
   const isInBacklog = backlogActions.isInBacklog(game?.id);
   const isCompleted = backlogActions.isCompleted(game?.id);
   const [selected, setSelected] = useState(isInBacklog);
@@ -26,14 +29,14 @@ export const BacklogBtns = ({
           icon={isInBacklog ? "check" : "plus"}
           selected={isInBacklog}
           onPress={() => {
-            if (!isInBacklog) {
-              backlogActions.addToBacklog(game?.id);
-              setSelected(true);
-            } else {
-              backlogActions.removeFromBacklog(game?.id);
-              setSelected(false);
-            }
-            backlogActions.reload();
+            // if (!isInBacklog) {
+            //   backlogActions.addToBacklog(game?.id, auth);
+            //   setSelected(true);
+            // } else {
+            //   backlogActions.removeFromBacklog(game?.id);
+            //   setSelected(false);
+            // }
+            // backlogActions.reload();
           }}
           animated
         />
