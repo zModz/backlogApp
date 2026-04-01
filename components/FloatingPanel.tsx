@@ -1,3 +1,4 @@
+import { FloatingPanelProps } from "@/types/floatingPanel";
 import { useFocusEffect, useNavigation } from "expo-router";
 import React, { useCallback, useRef, useState } from "react";
 import {
@@ -14,7 +15,6 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Animated, {
   interpolate,
   runOnJS,
-  SharedValue,
   useAnimatedReaction,
   useAnimatedStyle,
   useSharedValue,
@@ -23,43 +23,21 @@ import Animated, {
 
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 
-const { height: screenHeight } = Dimensions.get("window");
-
 export default function FloatingPanel({
   collapsedY,
   expandedY,
   onCollapse,
   onExpand,
   children,
-  translateY,
-  height,
+  height = 600,
   dragEnabled = true,
-  damping,
-  stiffness,
-}: {
-  collapsedY: number;
-  expandedY: number;
-  onCollapse: () => void;
-  onExpand: () => void;
-  children: (
-    isExpanded: boolean,
-    controls: { reset: () => void; expand: () => void },
-    scrollRef: React.RefObject<FlatList<any> | ScrollView>,
-    onScroll: number
-  ) => React.ReactNode;
-  translateY: SharedValue<number>;
-  // onTranslateYChange?: SharedValue<number>;
-  height?: number;
-  dragEnabled?: boolean;
-  damping: number,
-  stiffness: number,
-}) {
+}: FloatingPanelProps) {
   const theme = useTheme();
   const insets = useSafeAreaInsets();
   const navigation = useNavigation();
 
   // Shared animation state
-  // const translateY = useSharedValue(collapsedY);
+  const translateY = useSharedValue(collapsedY);
   const contextY = useSharedValue(collapsedY);
   const [isExpanded, setIsExpanded] = useState(false);
   const isAnimating = useSharedValue(false);
@@ -75,43 +53,8 @@ export default function FloatingPanel({
         runOnJS(setIsExpanded)(expanded);
       }
     },
-    [expandedY]
+    [expandedY],
   );
-
-  // useEffect(() => {
-  //   if (onTranslateYChange) onTranslateYChange(translateY);
-  // }, [translateY, onTranslateYChange]);
-
-  /** --- Core animation functions --- */
-  // const animateTo = useCallback(
-  //   (toValue: number, callback?: () => void) => {
-  //     "worklet";
-
-  //     isAnimating.value = true;
-
-  //     translateY.value = withSpring(
-  //       toValue,
-  //       {
-  //         damping: 20,
-  //         stiffness: 180,
-  //         overshootClamping: false,
-  //       },
-  //       (finished) => {
-  //         "worklet";
-
-  //         if (finished) {
-  //           isAnimating.value = false;
-
-  //           if (toValue === expandedY) setIsExpanded(true);
-  //           else setIsExpanded(false);
-
-  //           if (callback) runOnJS(callback)();
-  //         }
-  //       }
-  //     );
-  //   },
-  //   [expandedY]
-  // );
 
   const animateTo = (toValue: number, callback?: () => void) => {
     "worklet";
@@ -121,8 +64,8 @@ export default function FloatingPanel({
     translateY.value = withSpring(
       toValue,
       {
-        damping: damping,
-        stiffness: stiffness,
+        damping: 50,
+        stiffness: 350,
         overshootClamping: false,
       },
       (finished) => {
@@ -132,26 +75,13 @@ export default function FloatingPanel({
 
         isAnimating.value = false;
 
-        //
-        // if (toValue === expandedY) setIsExpanded(true);
-        // else setIsExpanded(false);
-
         // JS state updates
         if (finished && callback) {
           runOnJS(callback)();
         }
-      }
+      },
     );
   };
-
-  // const reset = useCallback(
-  //   () => animateTo(collapsedY, onCollapse),
-  //   [animateTo, collapsedY, onCollapse]
-  // );
-  // const expand = useCallback(
-  //   () => animateTo(expandedY, onExpand),
-  //   [animateTo, expandedY, onExpand]
-  // );
 
   const reset = () => {
     animateTo(collapsedY, onCollapse);
@@ -175,7 +105,7 @@ export default function FloatingPanel({
 
       translateY.value = Math.min(
         Math.max(contextY.value + event.translationY, expandedY),
-        collapsedY
+        collapsedY,
       );
     })
     .onEnd((event) => {
@@ -222,7 +152,7 @@ export default function FloatingPanel({
       translateY?.value,
       [expandedY, collapsedY],
       [0.3, 0],
-      "clamp"
+      "clamp",
     ),
   }));
 
@@ -239,7 +169,7 @@ export default function FloatingPanel({
 
       const sub = BackHandler.addEventListener(
         "hardwareBackPress",
-        onBackPress
+        onBackPress,
       );
       const blurSub = navigation.addListener("blur", reset);
 
@@ -247,12 +177,12 @@ export default function FloatingPanel({
         sub.remove();
         blurSub();
       };
-    }, [isExpanded, reset])
+    }, [isExpanded, reset]),
   );
 
   if (!translateY) {
     console.error(
-      "FloatingPanel: translateY is undefined. Make sure you pass a useSharedValue from the parent."
+      "FloatingPanel: translateY is undefined. Make sure you pass a useSharedValue from the parent.",
     );
     return null;
   }
@@ -279,7 +209,9 @@ export default function FloatingPanel({
             animatedPanelStyle,
             {
               backgroundColor: theme.colors.elevation.level1,
-              height: panelHeight ?? 600,
+              height: panelHeight,
+              borderTopLeftRadius: theme.roundness * 3.5,
+              borderTopRightRadius: theme.roundness * 3.5,
             },
           ]}
         >
@@ -316,8 +248,6 @@ const styles = StyleSheet.create({
     position: "absolute",
     left: 0,
     right: 0,
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
     elevation: 6,
     overflow: "hidden",
     zIndex: 999,

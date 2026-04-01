@@ -5,7 +5,7 @@ import {
 } from "react-native-paper";
 import { MD3Typescale } from "react-native-paper/lib/typescript/types";
 
-const ROUNDNESS = 10;
+const ROUNDNESS = 8;
 const fonts: MD3Typescale = {
   default: {
     fontFamily: "Roboto",
