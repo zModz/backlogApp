@@ -1,4 +1,5 @@
-import { AgeRating, InvolvedCompany, Platform } from "@/mockdata";
+import { mapGame } from "@/hook/useBacklogWithGames";
+import { AgeRating, Game, InvolvedCompany, Platform } from "@/mockdata";
 
 export async function fetchGameById(gameId: number, token: any) {
   const response = await fetch("https://api.igdb.com/v4/games", {
@@ -27,7 +28,7 @@ export async function fetchGameById(gameId: number, token: any) {
   return data[0];
 }
 
-export const fetchGames = async ({ pageParam = 0, queryKey }) => {
+export const fetchGames = async ({ pageParam = 0, queryKey }): Promise<{ results: Game[]; nextCursor: number | null }> => {
   const [_key, { search = "", filters = {}, sort = {}, token }] = queryKey;
 
   if (!token) throw new Error("No token provided to fetchGames");
@@ -101,33 +102,9 @@ export const fetchGames = async ({ pageParam = 0, queryKey }) => {
   const data = await response.json();
 
   // Map response to a more readable format
-  return data.map((game: any) => ({
-    id: game.id,
-    name: game.name,
-    slug: game.slug,
-    coverUrl:
-      game.cover?.url?.replace("t_thumb", "t_cover_big") ||
-      "https://upload.wikimedia.org/wikipedia/commons/a/a3/Image-not-found.png?20210521171500",
-    platforms: game.platforms?.map((p: Platform) => p.name) || [],
-    genres: game.genres?.map((g: any) => g.name) || [],
-    summary: game.summary || "No description",
-    totalRating: game.total_rating || null,
-    firstReleaseDate: game.first_release_date
-      ? new Date(game.first_release_date * 1000).toLocaleDateString()
-      : null,
-    releaseDates: [],
-    involvedCompanies: game.involved_companies.map(
-      (c: InvolvedCompany) => c.company.name || [],
-    ),
-    gameType: game.game_type.map((t: any) => t.type) || [],
-    screenshots: game.screenshots || [],
-    gameStatus: "",
-    gameModes: game.game_modes.map((m: any) => m.name) || [],
-    franchises: game.franchises.map((f: any) => f.name) || [],
-    ageRatings:
-      game.age_ratings.map((r: AgeRating) => {
-        `${r.organization.name} ${r.rating_category.rating}`;
-      }) || [],
-    parentGame: game.parent_game.map((p: any) => p.name) || [],
-  }));
+  // return data.map((game: any) => mapGame(game));
+  return {
+    results: data.map((game: any) => mapGame(game)),
+    nextCursor: data.length === 10 ? pageParam + 10 : null,
+  }
 };

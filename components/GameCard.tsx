@@ -1,11 +1,11 @@
 import { useAuth } from "@/contexts/AuthContext";
-import { useBacklogWithGames } from "@/hook/useBacklogWithGames";
 import { Game } from "@/mockdata";
 import { Image } from "expo-image";
 import React from "react";
 import { StyleSheet, View } from "react-native";
 import { Surface, Text } from "react-native-paper";
 import { BacklogBtns } from "./BacklogBtns";
+import { useBacklog } from "@/hook/useBacklog";
 
 type gameCard = {
   type: string;
@@ -13,8 +13,7 @@ type gameCard = {
 };
 
 const GameCard = ({ type, game }: gameCard) => {
-  const { auth } = useAuth();
-  const { backlogActions } = useBacklogWithGames(auth);
+  const { ...backlogActions } = useBacklog();
 
   return (
     <Surface elevation={1} style={styles.backlogCard}>
@@ -74,7 +73,6 @@ const GameCard = ({ type, game }: gameCard) => {
           <BacklogBtns
             game={game}
             type={type}
-            backlogActions={backlogActions}
           />
         </View>
       </View>

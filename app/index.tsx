@@ -5,16 +5,18 @@ import { useAuth } from "@/contexts/AuthContext";
 import { usePanel } from "@/contexts/PanelContext";
 import { useBacklog } from "@/hook/useBacklog";
 import { useBacklogWithGames } from "@/hook/useBacklogWithGames";
+import { Game } from "@/mockdata";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import React, { useRef, useState } from "react";
 import {
   Dimensions,
   FlatList,
   RefreshControl,
+  SectionList,
   StyleSheet,
   View,
 } from "react-native";
-import { Button, FAB, MD3Theme, Searchbar, useTheme } from "react-native-paper";
+import { Button, FAB, MD3Theme, Searchbar, Text, useTheme } from "react-native-paper";
 
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -66,14 +68,42 @@ export default function Index() {
           traileringIcon={"filter-variant"}
           onTraileringIconPress={() => {}}
         />
-        {__DEV__ && (
-          <Button
-            onPress={async () => await AsyncStorage.removeItem("@backlog")}
-          >
-            Clear
-          </Button>
-        )}
-        <FlatList
+        <SectionList 
+          sections={filteredGames.reduce((sections, item) => {
+            const status = item.status || "Unknown";
+            const section = sections.find((s: { status: string; data: Game[] }) => s.status === status);
+            if (section) {
+              section.data.push(item);
+            } else {
+              sections.push({ status, data: [item] });
+            }
+            return sections;
+          }, [])}
+          keyExtractor={(item) => item?.game?.id}
+          renderItem={({ item }) => <GameCard type="backlog" game={item?.game} />}
+          renderSectionHeader={({ section: { status } }) => (
+            <Text variant="titleMedium" style={{ marginVertical: 10 }}>
+              {status}
+            </Text>
+          )}
+          style={{
+            marginTop: 5,
+          }}
+          contentContainerStyle={{
+            paddingTop: 5,
+            paddingBottom: insets.bottom,
+            paddingHorizontal: 10,
+          }}
+          refreshControl={
+            <RefreshControl
+              refreshing={backlogActions.loading}
+              onRefresh={backlogActions.reload}
+            />
+          }
+        />
+
+
+        {/* <FlatList
           showsVerticalScrollIndicator={false}
           data={filteredGames}
           renderItem={({ item }) => (
@@ -84,7 +114,7 @@ export default function Index() {
           }}
           contentContainerStyle={{
             paddingTop: 5,
-            paddingBottom: insets.bottom + insets.top + 300,
+            paddingBottom: insets.bottom,
             paddingHorizontal: 10,
           }}
           refreshControl={
@@ -93,7 +123,15 @@ export default function Index() {
               onRefresh={backlogActions.reload}
             />
           }
-        />
+        /> */}
+        
+        {__DEV__ && (
+          <Button
+            onPress={async () => await AsyncStorage.removeItem("@backlog")}
+          >
+            Clear
+          </Button>
+        )}
       </View>
 
       <FAB

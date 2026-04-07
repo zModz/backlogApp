@@ -6,8 +6,9 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import GameCard from "./GameCard";
 import Animated, { useAnimatedScrollHandler } from "react-native-reanimated";
 import { FlatList } from "react-native-gesture-handler";
+import { Game } from "@/mockdata";
 
-const AnimFlatlist = Animated.createAnimatedComponent(FlatList);
+const AnimFlatlist = Animated.createAnimatedComponent(FlatList) as typeof FlatList;
 
 const GameList = ({ search, token, onScroll }) => {
   const insets = useSafeAreaInsets();
@@ -23,8 +24,8 @@ const GameList = ({ search, token, onScroll }) => {
   } = useInfiniteQuery({
     queryKey: ["searchGames", { search, token }],
     queryFn: fetchGames,
-    getNextPageParam: (lastPage, allPages) =>
-      lastPage.length < 10 ? undefined : allPages.length * 10,
+    getNextPageParam: (lastPage) =>
+      lastPage.results.length < 10 ? undefined : lastPage.nextCursor,
     enabled: !!token && !!search,
     initialPageParam: 0,
   });
@@ -51,16 +52,16 @@ const GameList = ({ search, token, onScroll }) => {
     );
   }
 
-  const games = data?.pages?.flat() ?? [];
-
-  const renderItem = ({ item }) => <GameCard type="search" game={item} />;
+  // console.log(data);
+  const games = data?.pages?.flatMap((page) => page.results) ?? [];
+  console.log("Fetched games:", games[0]);
 
   return (
-    <AnimFlatlist
+    <AnimFlatlist<Game>
       data={games}
       onScroll={handleScroll}
-      keyExtractor={(item) => item.id}
-      renderItem={renderItem}
+      keyExtractor={(item) => item.id.toString()}
+      renderItem={({ item }: { item: Game }) => <GameCard type="search" game={item} />}
       onEndReached={() => {
         if (hasNextPage && !isFetchingNextPage) {
           fetchNextPage();
