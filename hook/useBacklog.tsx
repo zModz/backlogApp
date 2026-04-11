@@ -105,6 +105,16 @@ export function useBacklog() {
     [backlog],
   );
 
+  //  Check if a game is completed
+  const isDropped = useCallback(
+    (gameId: number): boolean => {
+      return backlog.some(
+        (entry) => entry.gameId === gameId && entry.status === "Dropped",
+      );
+    },
+    [backlog],
+  );
+
   // Load data on mount
   useEffect(() => {
     loadBacklog();
@@ -118,6 +128,7 @@ export function useBacklog() {
     removeFromBacklog,
     isInBacklog,
     isCompleted,
+    isDropped,
     reload: loadBacklog,
   };
 }

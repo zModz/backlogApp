@@ -15,10 +15,14 @@ export const BacklogBtns = ({
   type,
 }: BacklogBtnsProps) => {
   const { auth } = useAuth();
+  const {...backlogActions} = useBacklog();
   
+  const isInBacklog = backlogActions.isInBacklog(game?.id);
+  const isCompleted = backlogActions.isCompleted(game?.id);
+  const isDropped = backlogActions.isDropped(game?.id);
   const [selected, setSelected] = useState(isInBacklog);
   const [completed, setCompleted] = useState(isCompleted);
-  const {...backlogActions} = useBacklog();
+  const [dropped, setDropped] = useState(isDropped);
 
   return (
     <View>
@@ -44,8 +48,9 @@ export const BacklogBtns = ({
         <>
           <IconButton
             mode="contained"
-            icon={isCompleted ? "check-all" : "check"}
+            icon={!isDropped ? isCompleted ? "check-all" : "check" : "close"}
             selected={isCompleted}
+            disabled={isDropped}
             onPress={() => {
               if (!isCompleted) {
                 backlogActions.updateBacklogEntry(game?.id, {
@@ -53,14 +58,14 @@ export const BacklogBtns = ({
                   completedAt: new Date().toISOString(),
                 });
                 setCompleted(true);
-                backlogActions.reload;
+                backlogActions.reload();
               } else {
                 backlogActions.updateBacklogEntry(game?.id, {
                   status: "Backlog",
                   completedAt: null,
                 });
                 setCompleted(false);
-                backlogActions.reload;
+                backlogActions.reload();
               }
 
             }}
@@ -69,7 +74,11 @@ export const BacklogBtns = ({
           <IconButton
             icon={"close"}
             onPress={() => {
-              backlogActions.removeFromBacklog(game?.id);
+              backlogActions.updateBacklogEntry(game?.id, {
+                status: "Dropped",
+                completedAt: null,
+              });
+              setDropped(true);
               backlogActions.reload();
             }}
           />

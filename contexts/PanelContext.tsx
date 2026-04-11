@@ -43,11 +43,12 @@ export const PanelProvider = ({ children }) => {
   };
 
   const close = () => {
+    setRequest(null);
+
     if (expandTimeoutRef.current) {
       clearTimeout(expandTimeoutRef.current);
       expandTimeoutRef.current = null;
     }
-    setRequest(null);
   };
 
   const update = (partial: Partial<PanelRequest>) => {
