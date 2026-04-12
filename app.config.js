@@ -27,6 +27,7 @@ export default ({ config }) => {
       enabled: true,
       checkAutomatically: "ON_LOAD",
       fallbackToCacheTimeout: 0,
+      url: "https://u.expo.dev/a5aef43d-7b8c-429d-acaf-a0e527acf4b7"
     },
     ios: {
       ...config.ios,
@@ -70,6 +71,9 @@ export default ({ config }) => {
     experiments: {
       typedRoutes: true,
       reactCompiler: true,
+    },
+    runtimeVersion: {
+      policy: "appVersion"
     },
     extra: {
       router: {},
